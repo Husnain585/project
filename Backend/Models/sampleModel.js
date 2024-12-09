@@ -2,9 +2,8 @@ const {models} = require("./sampleIndex");
 module.exports = {
     createUser : async (body) => {
         try {
-            console.log("check");
-            
-            const user = await models.sampleUser.create ({
+            console.log("check")
+            const user = await models.sampleUser.create({
                 ...body,
             });
             return {
@@ -18,7 +17,7 @@ module.exports = {
     },
     getAllUser : async () => {
         try {
-            const user = await models.users.findAll({
+            const user = await models.sampleUser.findAll({
                 attributes: ["name", "username", "email"], // to select specfic data member from database
                 // attributes: {
                 //     exclude: ["password", "createdAt", "updatedAt"],    // remove specific datamember 
@@ -35,7 +34,7 @@ module.exports = {
     },
     get : async ({username, userId}) => {
         try {
-            const user = await models.users.findOne({
+            const user = await models.sampleUser.findOne({
                 attributes: ["name", "username", "email"], // to select specfic data member from database
                 // attributes: {
                 //     exclude: ["password", "createdAt", "updatedAt"],    // remove specific datamember 
@@ -56,7 +55,7 @@ module.exports = {
     },
     updateUser : async ({username, ...body}) => {
         try {
-            const user = await models.users.update(
+            const user = await models.sampleUser.update(
                 {
                 ...body,
             },
@@ -76,7 +75,7 @@ module.exports = {
     },
     deleteUser : async ( {username} ) => {
         try {
-            const user = await models.users.destroy({
+            const user = await models.sampleUser.destroy({
                 where: {
                     username: username
                 }
