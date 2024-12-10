@@ -1,10 +1,8 @@
-const {models} = require("./sampleIndex");
+const {models} = require("./index");
 module.exports = {
     createUser : async (body) => {
         try {
-            console.log("check");
-            
-            const user = await models.sampleUser.create ({
+            const user = await models.users.create({
                 ...body,
             });
             return {
