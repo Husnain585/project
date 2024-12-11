@@ -1,7 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../../dbConnection");
 const { v4: uuid } = require("uuid");
-const { hash } = require("bcryptjs");
 
 class Products extends Model {}
 
@@ -22,8 +21,8 @@ Products.init(
         vendorId: {
             type: DataTypes.STRING(1000),
             references: {
-                model: "vendors", // Table name
-                key: "vendorId", // Column name
+                model: "vendors", 
+                key: "vendorId", 
             },
         },
     },
@@ -37,7 +36,6 @@ Products.init(
 
 Products.beforeCreate(async (product) => {
     product.productId = uuid();
-    product.password = hash(product.password, 10);
 });
 
 module.exports = Products;
