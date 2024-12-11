@@ -5,13 +5,11 @@ const GetProduct = () => {
   const [data, setData] = useState([]);
   const getAllUser = async () => {
     try {
-      console.log("check")
-      const { data } = await axios.get("http://localhost:3000/users/get-all", {
+      const { data } = await axios.get("http://localhost:3000/product/get-all", {
         withCredentials: true,
       });
-      console.log(data);
-
-      if (data.length > 0) {
+      console.log(data.data)
+      if (data.data.length > 0) {
         setData(data.data);
       }
     } catch (error) {
@@ -30,19 +28,19 @@ const GetProduct = () => {
 
   return (
     <>
-      <div className="-w-full h-full bg-red-800 relative top-16 p-2">
+      <div className=" w-[99%] h-[100%] scrollbar-thumb-blue-500 scrollbar-track-gray-300 gap-y-3 overflow-visible flex flex-wrap overflow-y-scroll scrollbar-thin  gap-x-2 p-2">
         {data.length > 0 ?
           (<>
             {data.map((user, Index) => {
               return (
                 <div
-                  key={index}
-                  className="w-1/3 h-2/6 bg-gray-100 rounded-md flex justify-between flex-col">
+                  key={Index}
+                  className="w-3/3 h-3/6  rounded-md flex justify-center bg-gray-700 items-center">
                   <div className="">
-                    <p className=' text-gray-500 text-normal font-normal'>{user.userId}</p>
-                    <p className=' text-gray-500 text-normal font-normal'>{user.username}</p>
-                    <p className=' text-gray-500 text-normal font-normal'>{user.name}</p>
-                    <p className=' text-gray-500 text-normal font-normal'>{user.email}</p>
+                    <h6 className='text-gray-300 text-2xl flex justify-center items-center font-normal'>Product details</h6>
+                    <p className=' text-white text-normal flex justify-center items-center font-normal'> product Name:  {user.name}</p>
+                    <p className=' text-white text-normal flex justify-center items-center font-normal'>Product Description:  {user.description}</p>
+                    <p className=' text-white text-normal flex justify-center items-center font-normal '>ProductId: {user.productId}</p>
                   </div>
                 </div>
               )

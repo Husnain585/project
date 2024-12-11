@@ -3,7 +3,7 @@ import NavBar from './nav-bar';
 const Layout = ( {children}) => {
 return (
   <>
-  <div className="w-screen h-screen flex flex-col">
+  <div className="w-full h-screen flex flex-col">
   <div>
     <NavBar />
   </div>
@@ -12,7 +12,7 @@ return (
 
 
     {/* Main Content */}
-    <div className="w-screen h-6/6 relative top-20 ">
+    <div className="w-full h-screen">
       {children}
     </div>
   </div>

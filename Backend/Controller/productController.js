@@ -1,9 +1,5 @@
-const { createProduct} = require("../models/productModel");
-const responseHandler = require("../responsHandler")
-const { hash } = require("bcryptjs");
-const { v4: uuid } = require("uuid");
-const { models } = require("../models");
-const { response } = require("express");
+const { createProduct, getAllProduct, deleteProduct} = require("../Models/productModel");
+const responseHandler = require("../responsHandler");
 
 module.exports = {
     create: async (req, res) => {
@@ -22,4 +18,12 @@ module.exports = {
             return responseHandler(res, {response: error});
         }
     },
+    delProduct: async (req, res) => {
+        try {
+            const response = await deleteProduct(req.query);
+            return responseHandler(res, response);
+        } catch (error) {
+            return responseHandler(res, {response: error});
+        }
+    }
 };
