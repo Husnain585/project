@@ -56,14 +56,13 @@ const Login = ({ setAuth }) => {
 
           {/* Submit Button */}
           <div className="mb-4">
-            <input
-              type="submit"
-              value="LogIn"
-              className="w-full p-2 bg-blue-500 text-white font-semibold uppercase rounded-xl tracking-wide shadow-md hover:brightness-110 cursor-pointer"
-              onClick={() => {
-                navigate("/index")
-              }}
-            />
+            <button
+            type="submit" 
+            className="w-full p-2 bg-blue-500 text-white font-semibold uppercase rounded-xl tracking-wide shadow-md hover:brightness-110 cursor-pointer"
+            onClick={()=>{
+              navigate("/index");
+            }}
+            >Login</button>
           </div>
 
           {/* Forgot Password Link */}

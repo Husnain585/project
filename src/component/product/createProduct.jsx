@@ -1,18 +1,31 @@
 import { useState } from "react";
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 const CreateProduct = () => {
 const [name, setName] = useState("")
 const [email, setEmail] = useState("")
 const [password, setPassword] = useState("")
-const [cPassword, setcPassword] = useState("")
+const [cPassword, setCPassword] = useState("")
 const [username, setUsername] = useState("")
+const [description, setDesc] = useState("")
 
-const accessProduct = ( ) => {
-  console.log(name);
-  console.log(username);
-  console.log(email);
-  console.log(password);
-  console.log(cPassword);
+const productCreate = async () => {
+  const { data } = await axios.post("http://localhost:3000/product/create", {
+      name,
+      description
+  } ,{
+    withCredentials: true,
+  });
+  if(Object.values(data?.data).length > 0 ){
+    alert("product created successfully");
+    console.log("success");
+    return  Navigate("product/get-product");
+    console.log("navigate");
+  }
+  else{
+    alert(data.error);
+  }
 }
 
   return (
@@ -27,46 +40,46 @@ const accessProduct = ( ) => {
       </div>
       </div>
         <div className="w-full h-5/6 flex flex-col">
-        
         <div className=" flex flex-row gap-4 p-2 h-6/6 w-full ">
-          <div className="w-1/2 h-full bg-white flex flex-col">
-          <label htmlFor="" className="text-lg text-gray-500">Name</label>
+          {/* <div className="w-1/2 h-full bg-white flex flex-col">
+          <label className="text-lg text-gray-500">Name</label>
           <input
           onChange={(e) => {
             setName(e.target.value);
           }}
-          type="text" placeholder="Enter your Product" required className="p-2 bg-gray-200 w-72 focus:outline-none " id="" />
-          <label htmlFor="" className="text-lg text-gray-500">Password</label>
+          type="text" name="name" placeholder="Enter your Name" required className="p-2 bg-gray-200 w-72 focus:outline-none " />
+          <label className="text-lg text-gray-500">Password</label>
           <input
           onChange={(e) => {
             setPassword(e.target.value);
           }}
-          type="password" placeholder="Enter your Password" required className="p-2 bg-gray-200 w-72 focus:outline-none " id="" />
-          <label htmlFor="" className="text-lg text-gray-500">Confirm Password</label>
+          type="password" placeholder="Enter your Password" required className="p-2 bg-gray-200 w-72 focus:outline-none" name="password" id="" />
+          <label className="text-lg text-gray-500">Confirm Password</label>
           <input
           onChange={(e) => {
-            setPassword(e.target.value);
+            setCPassword(e.target.value);
           }}
-          type="password" placeholder="Enter your Product" required className="p-2 bg-gray-200 w-72 focus:outline-none " id="" />
-          </div>
+          type="password" placeholder="Confirm Your Password" required className="p-2 bg-gray-200 w-72 focus:outline-none" name="cpassword" />
+          </div> */}
           <div className="w-1/2 h-full bg-white flex flex-col">
-          <label htmlFor="" className="text-lg text-gray-500">Username</label>
+          <label className="text-lg text-gray-500">Name</label>
           <input
           onChange={(e) => {
-            setUsername(e.target.value);
+            setName(e.target.value);
           }}
-          type="text" placeholder="Enter your Product" required className="p-2 bg-gray-200 w-72 focus:outline-none " id="" />
-          <label htmlFor="" className="text-lg text-gray-500">Email</label>
+          type="text" name="name" placeholder="Enter your Name" required className="p-2 bg-gray-200 w-72 focus:outline-none" />
+          <label className="text-lg text-gray-500">Description</label>
           <input 
           onChange={(e) => {
-            console.log(e.target.value)
-            email(e.target.value)
+            setDesc(e.target.value);
           }}
-          type="email" placeholder="Enter your Product" required className="p-2 bg-gray-200 w-72 focus:outline-none " id="" />
-          <button 
-          onClick={(setEmail)}
-          disabled={!(name && email && password && cPassword && email)}
-          className="border-2 bg-gray-800 text-center text-white py-3 px-8 w-40 mt-4 font-semibold cursor-pointer">CreateProduct</button>
+          type="email" name="description" placeholder="Enter your Description" required className="p-2 bg-gray-200 w-72 focus:outline-none" />
+          <button
+          onClick={productCreate}
+          disabled={!(name && description)}
+          type="submit" className="border-2 bg-gray-800 text-center text-white py-3 px-8 w-40 mt-4 font-semibold cursor-pointer rounded-md
+          disabled:bg-gray-400 disabled:text-gray-800
+          ">CreateProduct</button>
           </div>
         </div>
         </div>

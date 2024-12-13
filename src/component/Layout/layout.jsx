@@ -12,7 +12,7 @@ return (
 
 
     {/* Main Content */}
-    <div className="w-full h-screen">
+    <div className="w-full h-screen  relative top-20">
       {children}
     </div>
   </div>

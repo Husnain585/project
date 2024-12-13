@@ -2,10 +2,10 @@ import React, { Children } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 
 const Product = ({ children }) => {
-    // const navigate = useNavigatea();
+    const navigate = useNavigate();
   return (
     <>
-    <div className='w-full h-full flex flex-col p-4 relative top-20'>
+    <div className='w-full h-full flex flex-col p-4 '>
     <h1 className='font-semibold w-2/6 text-2xl '>Product Page</h1>
     <div className="w-full h-full ">   
     <div className="w-full h-1/6 pt-4 flex gap-3 ">
