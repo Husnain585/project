@@ -1,6 +1,0 @@
-<input
-              
-              value="LogIn"
-              
-              
-            />

@@ -1,4 +1,4 @@
-const {models} = require("./index");
+const {models } = require("./index");
 module.exports = {
     createUser : async (body) => {
         try {
@@ -17,7 +17,7 @@ module.exports = {
     getAllUser : async () => {
         try {
             const user = await models.users.findAll({
-                attributes: ["name", "username", "email"], // to select specfic data member from database
+                attributes: ["userId" ,"name", "username", "email"], // to select specfic data member from database
                 // attributes: {
                 //     exclude: ["password", "createdAt", "updatedAt"],    // remove specific datamember 
                 // },
@@ -31,6 +31,26 @@ module.exports = {
             }
         }
     },
+    getOneUser : async ({ email, username }) => {
+        try {
+          const user = await models.users.findOne({
+            paranoid: false,
+            attributes: ["userId", "name", "username", "email", "password"],
+    
+            where: {
+              ...(email != "false" ? { email: email } : { username: username }),
+            },
+          });
+    
+          return {
+            response: user,
+          };
+        } catch (error) {
+          return {
+            error: error,
+          };
+        }
+      },
     get : async ({username, userId}) => {
         try {
             const user = await models.users.findOne({

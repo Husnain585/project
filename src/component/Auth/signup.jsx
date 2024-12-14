@@ -1,6 +1,6 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const Signup = ({setAuth}) => {
-  const Navigate = useNavigate()
+  const navigate = useNavigate()
   return (
     <>
       <div className="w-full h-screen flex justify-center items-center">
@@ -24,7 +24,7 @@ const Signup = ({setAuth}) => {
             <div className='flex justify-center'>
             <button className='p-2 bg-blue-500 w-32 rounded-md text-xl'
             onClick={()=> {
-              Navigate("/index")
+              navigate("/index")
             }}
             >SignUp </button>
             </div>

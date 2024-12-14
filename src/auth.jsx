@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Signup from './Component/Auth/signup';
+import Signup from './component/Auth/signup';
 import Login from './Component/Auth/login';
 
 const Auth = () => {

@@ -1,7 +1,7 @@
-const {models} = require("./index");
+const { models } = require("./index");
 
 module.exports = {
-    createProduct : async (body) => {
+    createProduct: async (body) => {
         try {
             const user = await models.products.create({
                 ...body,
@@ -11,29 +11,64 @@ module.exports = {
             }
         } catch (error) {
             console.log(error)
-            return{
+            return {
                 error: error,
             }
         }
     },
-    getAllProduct : async () => {
+    getAllProduct: async (vendorId) => {
         try {
-            const user = await models.products.findAll({
-                attributes: ["name", "description", "productId"], // to select specfic data member from database
-                // attributes: {
-                //     exclude: ["password", "createdAt", "updatedAt"],    // remove specific datamember 
-                // },
-                paranoid: false});
-            return{
-                response: user,
-            }
+            const product = await models.products.findAll({
+                where: { vendorId: vendorId },
+                paranoid: false,
+                attributes: ["productId", "name", "description"],
+                include: 
+                    {
+                        model: models.vendors,
+                        as: "vendor",
+                        attributes: ["vendorId", "username"],
+                    },
+                
+                });
+            return {
+                response: product,
+            };
         } catch (error) {
-            return{
+            return {
                 error: error,
-            }
+            };
         }
     },
-    deleteProduct : async ( {name} ) => {
+    getOneProduct: async ({ productName }) => {
+        try {
+          const product = await models.products.findOne({
+            paranoid: false,
+    
+            where: {
+              productName: productName,
+            },
+    
+            attributes: ["productId", "productName", "description"],
+    
+            include: [
+              {
+                model: models.vendors,
+                as: "vendors",
+                attributes: ["vendorId", "username"],
+              },
+            ],
+          });
+    
+          return {
+            response: product,
+          };
+        } catch (error) {
+          return {
+            error: error,
+          };
+        }
+      },
+    deleteProduct: async ({ name }) => {
         try {
             console.log("check")
             const user = await models.products.destroy({
@@ -42,13 +77,35 @@ module.exports = {
                 }
             });
             console.log("succfully");
-            return{
+            return {
                 response: user,
             }
         } catch (error) {
-            return{
+            return {
                 error: error,
             }
         }
     },
+    updateProduct: async ({ productName, ...body }) => {
+        try {
+          const product = await models.products.update(
+            {
+              ...body,
+            },
+            {
+              where: {
+                productName: productName,
+              },
+            }
+          );
+    
+          return {
+            response: product,
+          };
+        } catch (error) {
+          return {
+            error: error,
+          };
+        }
+      },
 }

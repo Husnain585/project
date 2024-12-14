@@ -35,7 +35,7 @@ const GetProduct = () => {
               return (
                 <div
                   key={Index}
-                  className="w-3/3 h-3/6  rounded-md flex justify-center bg-gray-700 items-center">
+                  className="w-[32%] h-[28%]  rounded-md flex justify-center bg-gray-700 items-center">
                   <div className="">
                     <h6 className='text-gray-300 text-2xl flex justify-center items-center font-normal'>Product details</h6>
                     <p className=' text-white text-normal flex justify-center items-center font-normal'> product Name:  {user.name}</p>
@@ -55,5 +55,4 @@ const GetProduct = () => {
 
     </>)
 }
-
 export default GetProduct;

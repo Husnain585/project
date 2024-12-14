@@ -20,7 +20,7 @@ const getUser = joi.object({
 });
 
 module.exports = {
-     Create : async (req, res, next) => {
+     createValidate : async (req, res, next) => {
         try{ 
            await CreateUser.validateAsync(req.body);
             next();
@@ -30,7 +30,7 @@ module.exports = {
             });
         }
      },
-     Update : async (req, res, next) => {
+     updateValidate : async (req, res, next) => {
         try{
            await Update.validateAsync(req.body);
             next();
@@ -40,7 +40,7 @@ module.exports = {
             });
         }
      },
-     GetDelete : async (req, res, next) => {
+     delValidate : async (req, res, next) => {
         try{
            await GetDelete.validateAsync(req.query);
             next();
@@ -50,7 +50,7 @@ module.exports = {
             });
         }
      },
-     getUser : async (req, res, next) => {
+     getUserValidate : async (req, res, next) => {
         try{
            await getUser.validateAsync(req.query);
             next();

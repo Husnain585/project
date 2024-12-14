@@ -28,21 +28,34 @@ const models = {
 // relations
 
 // vendor product 1:M
-vendors.hasMany(products, {foreignKey: "productId" });
-products.belongsTo(vendors, {foreignKey: "vendorId" });
+vendors.hasMany(products, {foreignKey: "productId", as: "Product" });
+products.belongsTo(vendors, {foreignKey: "vendorId", as: "vendor" });
 
 // product productVaiations 1:M
-// products.hasMany(productsVariations, {foreignKey: "variationId"});
-// productsVariations.belongsTo(products, {foreignKey: "variationId"});
+
+products.hasMany(productVariations, {foreignKey: "productId ", as: "productVariations"});
+productVariations.belongsTo(products, {foreignKey: "productId", as: "products"});
 
 // variations attribute M:M through variationHasAttribute
 
-// productsVariations.hasMany(variationHasAttributes, {foreignKey: "productsVariationId"}, {through: attributes});
-// variationHasAttributes.belongsTo(productsVariations, {foreignKey: "productsVariationId"}, {through: attributes});
-
-// attributes.hasMany(variationHasAttributes, {foreignKey: "attribueteId", as: "attribute"});
-// variationHasAttributes.belongsTo(attributes, {foreignKey: "attributeId", as: "attribuete"});
-
+  productVariations.hasMany(variationHasAttributes, {
+    foreignKey: "productVariationId ",
+    as: "variationsHasAttribute",
+  });
+  variationHasAttributes.belongsTo(productVariations, {
+    foreignKey: "productVariationId",
+    as: "productVariations",
+  });
+  
+  attributes.hasMany(variationHasAttributes, {
+    foreignKey: "attributeId ",
+    as: "variationsHasAttribute",
+  });
+  variationHasAttributes.belongsTo(attributes, {
+    foreignKey: "attributeId",
+    as: "attributes",
+  });
+  
 
 const db = {};
 db.connection = connection;

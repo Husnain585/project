@@ -1,5 +1,5 @@
 const express = require("express");
-const bodyparser = require("body-parser");
+const bodyParser = require("body-parser");
 const userModel = require("./routes/userRouter");
 const auth = require("./routes/authRouter");
 const connection = require("./dbConnection");
@@ -7,10 +7,12 @@ const userModule = require("./routes/userRouter");
 const vendorRouter = require("./routes/vendorRouter");
 const productRouter = require("./routes/productRouter");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const app = express();
-app.use(bodyparser.urlencoded({ extended: true }))
-app.use(bodyparser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json());
+app.use(cookieParser())
 app.use(cors({
     origin: true,
     credentials: true,

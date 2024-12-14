@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 const CreateProduct = () => {
 const [name, setName] = useState("")
@@ -9,6 +10,7 @@ const [password, setPassword] = useState("")
 const [cPassword, setCPassword] = useState("")
 const [username, setUsername] = useState("")
 const [description, setDesc] = useState("")
+const navigate = useNavigate();
 
 const productCreate = async () => {
   const { data } = await axios.post("http://localhost:3000/product/create", {
@@ -17,11 +19,10 @@ const productCreate = async () => {
   } ,{
     withCredentials: true,
   });
-  if(Object.values(data?.data).length > 0 ){
+  if(Object.values(data.data).length > 0 ){
     alert("product created successfully");
     console.log("success");
-    return  Navigate("product/get-product");
-    console.log("navigate");
+    return  navigate("product/get-product");
   }
   else{
     alert(data.error);
@@ -30,8 +31,8 @@ const productCreate = async () => {
 
   return (
     <>
-      <div className="w-5/6 h-6/ p-4 relative top-[-30px]">
-      <div className="5/6 h-3/6 relative top-[-10px]">
+      <div className="w-5/6 h-6/ p-4  relative top-[-30px]">
+      <div className="5/6 h-3/6  relative top-[-10px]">
       <div className="w-5/6">
         <h1 className="font-semibold text-lg  text-gray-600 py-2">Create Product</h1>
         <div className="w-32 h-32 bg-slate-500 flex gap-x-2justify-center items-center cursor-pointer">
@@ -39,28 +40,9 @@ const productCreate = async () => {
         </div>
       </div>
       </div>
-        <div className="w-full h-5/6 flex flex-col">
+        <div className="w-full  h-5/6 flex flex-col">
         <div className=" flex flex-row gap-4 p-2 h-6/6 w-full ">
-          {/* <div className="w-1/2 h-full bg-white flex flex-col">
-          <label className="text-lg text-gray-500">Name</label>
-          <input
-          onChange={(e) => {
-            setName(e.target.value);
-          }}
-          type="text" name="name" placeholder="Enter your Name" required className="p-2 bg-gray-200 w-72 focus:outline-none " />
-          <label className="text-lg text-gray-500">Password</label>
-          <input
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-          type="password" placeholder="Enter your Password" required className="p-2 bg-gray-200 w-72 focus:outline-none" name="password" id="" />
-          <label className="text-lg text-gray-500">Confirm Password</label>
-          <input
-          onChange={(e) => {
-            setCPassword(e.target.value);
-          }}
-          type="password" placeholder="Confirm Your Password" required className="p-2 bg-gray-200 w-72 focus:outline-none" name="cpassword" />
-          </div> */}
+          
           <div className="w-1/2 h-full bg-white flex flex-col">
           <label className="text-lg text-gray-500">Name</label>
           <input

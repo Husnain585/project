@@ -1,5 +1,6 @@
 import React, { Children } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
+import ProductDetail from './component/contact/contact';
 
 const Product = ({ children }) => {
     const navigate = useNavigate();
@@ -13,7 +14,8 @@ const Product = ({ children }) => {
     <Link className='bg-gray-950 h-12 text-white py-2 text-sm px-3 rounded-md' to="/product/get-product">Get Product</Link>
     </div>
     <div className="w-full h-5/6">
-        {children}
+        {/* {children} */}
+        <ProductDetail />
     </div>
     </div>
     </div>

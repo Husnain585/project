@@ -5,13 +5,14 @@ import Product from "./product";
 import GetProduct from "./component/product/getProduct";
 import CreateProduct from "./component/product/createProduct";
 import Layout from "./component/Layout/layout";
-import { createContext, useEffect, useState } from "react";
+import ProductDetail from "./component/contact/contact";
+import { createContext} from "react";
+
 
 const productContext = createContext();
 
 
 const App = () => {
-  const [product, setProduct] = useState("saud");
   const location = useLocation();
   const isAuthPath = location.pathname === "/";
   return (
@@ -22,11 +23,10 @@ const App = () => {
             <Route index element={<Auth />} />
           </Routes>
         ) : (
-          <productContext.Provider value={{product}}>
           <Layout>
             <Routes>
-              
               <Route path="index" element={<Index />} /> 
+              <Route path="index/contact" element={< ProductDetail/>} />
               <Route path="product">
                 <Route index element={<Product />} />
                 <Route path="create-product" element={
@@ -38,7 +38,6 @@ const App = () => {
               </Route>
             </Routes>
           </Layout>
-          </productContext.Provider>
         )}
       </div>
     </>
