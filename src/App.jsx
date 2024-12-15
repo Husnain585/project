@@ -5,11 +5,8 @@ import Product from "./product";
 import GetProduct from "./component/product/getProduct";
 import CreateProduct from "./component/product/createProduct";
 import Layout from "./component/Layout/layout";
-import ProductDetail from "./component/contact/contact";
-import { createContext} from "react";
-
-
-const productContext = createContext();
+import AdminDashboard from "./component/product/adminPage";
+import ProductDetail from "./component/productLayout/productDetails";
 
 
 const App = () => {
@@ -25,8 +22,9 @@ const App = () => {
         ) : (
           <Layout>
             <Routes>
-              <Route path="index" element={<Index />} /> 
-              <Route path="index/contact" element={< ProductDetail/>} />
+              <Route path="index" element={<Index />} />
+              <Route path="admin" element={<AdminDashboard/>} />
+              <Route path="shopping" element={<ProductDetail/>} />
               <Route path="product">
                 <Route index element={<Product />} />
                 <Route path="create-product" element={

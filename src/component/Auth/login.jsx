@@ -1,4 +1,6 @@
 import React from 'react'
+import { FaLock } from 'react-icons/fa';
+import { FaUser } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
 const Login = ({ setAuth }) => {
@@ -24,7 +26,8 @@ const Login = ({ setAuth }) => {
 
           {/* Username Field */}
           <div className="mb-4">
-            <span className="block text-white uppercase text-sm tracking-wide mb-2 border-l-4 pl-2 border-white">
+            <span className="flex m-2 gap-x-1 text-white uppercase text-sm tracking-wide mb-2 border-l-4 pl-2 border-white">
+              <i className=""><FaUser/></i>
               Username
             </span>
             <div className="relative flex items-center">
@@ -37,7 +40,8 @@ const Login = ({ setAuth }) => {
 
           {/* Password Field */}
           <div className="mb-4">
-            <span className="block text-white uppercase text-sm tracking-wide mb-2 border-l-4 pl-2 border-white">
+            <span className="flex m-2 gap-x-1 text-white uppercase text-sm tracking-wide  border-l-4 pl-2 border-white">
+              <i className=""><FaLock/></i>
               Password
             </span>
             <div className="relative flex items-center">

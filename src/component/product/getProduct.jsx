@@ -8,10 +8,10 @@ const GetProduct = () => {
       const { data } = await axios.get("http://localhost:3000/product/get-all", {
         withCredentials: true,
       });
-      console.log(data.data)
       if (data.data.length > 0) {
         setData(data.data);
       }
+      console.log(data.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Axios Error:", error.message);
@@ -31,7 +31,7 @@ const GetProduct = () => {
       <div className=" w-[99%] h-[100%] scrollbar-thumb-blue-500 scrollbar-track-gray-300 gap-y-3 overflow-visible flex flex-wrap overflow-y-scroll scrollbar-thin  gap-x-2 p-2">
         {data.length > 0 ?
           (<>
-            {data.map((user, Index) => {
+            {data.map((user, Index, vendorId) => {
               return (
                 <div
                   key={Index}
@@ -41,6 +41,7 @@ const GetProduct = () => {
                     <p className=' text-white text-normal flex justify-center items-center font-normal'> product Name:  {user.name}</p>
                     <p className=' text-white text-normal flex justify-center items-center font-normal'>Product Description:  {user.description}</p>
                     <p className=' text-white text-normal flex justify-center items-center font-normal '>ProductId: {user.productId}</p>
+                    <p className=' text-white text-normal flex justify-center items-center font-normal '>VendorId: {user.vendor?.vendorId}</p>
                   </div>
                 </div>
               )
