@@ -3,7 +3,7 @@ const connection = require("../../dbConnection");
 const { v4: uuid } = require("uuid");
 const vendors = require("./vendor");
 
-class Products extends Model {}
+class Products extends Model { }
 
 Products.init(
     {
@@ -23,8 +23,8 @@ Products.init(
             type: DataTypes.STRING(1000),
             allowNull: false,
             references: {
-                model: vendors, 
-                key: "vendorId", 
+                model: vendors,
+                key: "vendorId",
             },
         },
     },

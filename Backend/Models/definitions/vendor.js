@@ -1,6 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../../dbConnection");
 const { v4: uuid } = require("uuid");
+const {hash} = require("bcrypt")
 
 class Vendors extends Model {}
 

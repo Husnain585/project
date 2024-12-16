@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,8 @@ const [name, setName] = useState("")
 const [vendorId, setVendorId] = useState("")
 const [description, setDesc] = useState("")
 const navigate = useNavigate();
+const [productImage, setProdImage] = useState("");
+const imageUpload = useRef();
 
 const productCreate = async () => {
   const { data } = await axios.post("http://localhost:3000/product/create", {
@@ -34,10 +36,26 @@ const productCreate = async () => {
       <div className="w-full h-[300px] items-center flex justify-start flex-col ml-48 ">
         <h1 className="font-semibold text-lg   text-gray-600 py-2">Create Product</h1>
         <div className="flex justify-center items-center ">
-          <div className="w-32 h-32 bg-slate-500 rounded-full flex justify-center items-center relative cursor-pointer">
-            <p className="text-white text-4xl font-bold">+</p>
-            <span className="absolute bottom-[-20px] text-gray-600 font-semibold">Add Picture</span>
-          </div>
+          <div className="rounded-full bg-slate-500 w-32 h-32"
+          onChange={(e) => {
+            imageUpload.current.click()
+          }}
+          >
+          <input className="w-24 relative top-10" 
+            onChange={(e) => {
+              const avatarFiles = e.target.files[0];
+              const imageURL = URL.createObjectURL(avatarFiles);
+              console.log(imageURL);
+            }}
+            type="file" 
+            accept="image/*"
+            multiple
+            ref={imageUpload}
+            name="name"
+            required   
+            />
+            </div>
+            <span className="absolute bottom-[170px] text-gray-600 font-semibold">Add Picture</span>
         </div>
       </div>
       </div>

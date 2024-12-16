@@ -9,7 +9,6 @@ module.exports = {
       if (token == "undefined") {
         return responseHandler(res, { error: "Unauthorized User" });
       }
-
       verify(token, process.env.SECRET, (error, data) => {
         if (error) {
           return responseHandler(res, { error: "Forbidden Access" });

@@ -1,13 +1,14 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const morgan = require("morgan");
 const userModel = require("./routes/userRouter");
 const auth = require("./routes/authRouter");
-const connection = require("./dbConnection");
-const userModule = require("./routes/userRouter");
 const vendorRouter = require("./routes/vendorRouter");
 const productRouter = require("./routes/productRouter");
+const { db } = require("./models/index");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
+
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -17,9 +18,9 @@ app.use(cors({
     origin: true,
     credentials: true,
 }));
-
+app.use(morgan("dev"));
 app.use("/users", userModel);
-app.use("/author", auth);
+app.use("/auth", auth);
 app.use("/vendor", vendorRouter);
 app.use("/product", productRouter);
 
@@ -29,7 +30,7 @@ app.get("/", (req, res) => {
     res.send("welcome");
 });
 
-connection
+db.connection
     .sync({ alter: true, logging: false })
     .then(() => {
         app.listen(3000);

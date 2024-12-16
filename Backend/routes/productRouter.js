@@ -1,12 +1,10 @@
 const routes = require("express").Router();
-const {create , getAll, delProduct , getOneProduct, Update} = require("../Controller/productController");
-const {middleWare} = require("../middleware");
-const { updateProduct } = require("../Models/productModel");
-
-routes.post("/create", create);
-routes.get("/get-all",  getAll);
-routes.get("/delete", delProduct);
-routes.get("/get", getOneProduct);
-routes.patch("/update", Update);
+const {create , getAll, DeleteProduct , getProduct, UpdateProduct} = require("../Controller/productController");
+const {middleWare} = require("../middleware")
+routes.post("/create", middleWare,create);
+routes.get("/get-all", middleWare, getAll);
+routes.get("/delete", middleWare,DeleteProduct);
+routes.get("/get", middleWare, getProduct);
+routes.patch("/update",middleWare, UpdateProduct);
 
 module.exports = routes;

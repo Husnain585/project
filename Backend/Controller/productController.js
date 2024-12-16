@@ -20,27 +20,25 @@ module.exports = {
             return responseHandler(res, {response: error});
         }
     },
-    getOneProduct: async (req, res) => {
+    getProduct: async (req, res) => {
         try {
           const response = await getOneProduct(req.query);
-    
           return responseHandler(res, response);
         } catch (error) {
           return responseHandler(res, { error: error });
         }
       },
-    delProduct: async (req, res) => {
+      DeleteProduct: async (req, res) => {
         try {
-            const response = await deleteProduct(req.query);
-            return responseHandler(res, response);
+          const response = await deleteProduct(req.query);
+          return responseHandler(res, response);
         } catch (error) {
-            return responseHandler(res, {response: error});
+          return responseHandler(res, { error: error });
         }
-    },
-    Update: async (req, res) => {
+      },
+      UpdateProduct: async (req, res) => {
         try {
           const response = await updateProduct(req.body);
-    
           return responseHandler(res, response);
         } catch (error) {
           return responseHandler(res, { error: error });

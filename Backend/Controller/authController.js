@@ -37,11 +37,10 @@ module.exports = {
       delete response.response.dataValues.password;
 
       const token = sign(response.response.dataValues, process.env.SECRET, {
-        expiresIn: 60,
+        expiresIn: 6000,
       });
 
       res.cookie("auth", token, { maxAge: 60000 });
-
 
       return responseHandler(res, { response: token });
     } catch (error) {

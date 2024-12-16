@@ -1,21 +1,17 @@
-require('dotenv').config(); // Load .env variables
+require('dotenv').config(); 
 
 const { Sequelize } = require('sequelize');
-
-// Creating a Sequelize instance using environment variables
 const connection = new Sequelize(
-  process.env.DBNAME, // Database name
-  process.env.DBUSERNAME, // Username
-  process.env.DBPASSWORD, // Password
+  process.env.DBNAME, 
+  process.env.DBUSERNAME,
+  process.env.DBPASSWORD,
   {
-    host: process.env.DBHOST, // Database host
-    dialect: process.env.DBDIALECT, // Database dialect (postgres)
-    port: process.env.DBPORT, // Port for PostgreSQL
-    logging: console.log, // Logs SQL queries for debugging (optional)
+    host: process.env.DBHOST, 
+    dialect: process.env.DBDIALECT, 
+    port: process.env.DBPORT, 
   }
 );
 
-// Test the connection
 connection
   .authenticate()
   .then(() => {

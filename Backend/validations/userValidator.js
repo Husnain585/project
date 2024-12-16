@@ -1,63 +1,42 @@
 const joi = require("joi");
-const CreateUser = joi.object({
+const responseHandler = require("../responsHandler");
+const create = joi.object({
     name: joi.string().required(),
-    username: joi.string().alphanum().required(),
+    username: joi.string().required(),
     password: joi.string().required(),
     email: joi.string().email().required(),
 });
-const Update = joi.object({
-    username: joi.string().alphanum().required(),
-    name: joi.string(),
-    email: joi.string().email(),
-});
-const GetDelete = joi.object({
+const update = joi.object({
+    name: joi.string().required(),
     username: joi.string().required(),
-    // userId: joi.string().required(),
 });
-const getUser = joi.object({
+const getDelete = joi.object({
     username: joi.string().required(),
-    userId: joi.string().required(),
+    email: joi.string().required(),
 });
-
 module.exports = {
-     createValidate : async (req, res, next) => {
-        try{ 
-           await CreateUser.validateAsync(req.body);
-            next();
-        }catch(error){
-            return res.send({
-                error: error,
-            });
+    createUserSchema: async (req, res, next) => {
+        try {
+            await create.validateAsync(req.body);
+            next()
+        } catch (error) {
+            return responseHandler(res, { error: error.message })
         }
-     },
-     updateValidate : async (req, res, next) => {
-        try{
-           await Update.validateAsync(req.body);
-            next();
-        }catch(error){
-            return res.send({
-                error: error,
-            });
+    },
+    updateUserSchema: async (req, res, next) => {
+        try {
+            await update.validateAsync(req.body);
+            next()
+        } catch (error) {
+            return responseHandler(res, { error: error.message })
         }
-     },
-     delValidate : async (req, res, next) => {
-        try{
-           await GetDelete.validateAsync(req.query);
-            next();
-        }catch(error){
-            return res.send({
-                error: error,
-            });
+    },
+    getDeleteUserSchema: async (req, res, next) => {
+        try {
+            await getDelete.validateAsync(req.query);
+            next()
+        } catch (error) {
+            return responseHandler(res, { error: error.message })
         }
-     },
-     getUserValidate : async (req, res, next) => {
-        try{
-           await getUser.validateAsync(req.query);
-            next();
-        }catch(error){
-            return res.send({
-                error: error,
-            });
-        }
-     },
-};
+    },
+}
