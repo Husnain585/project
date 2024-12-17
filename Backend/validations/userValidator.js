@@ -1,5 +1,5 @@
 const joi = require("joi");
-const responseHandler = require("../responsHandler");
+const responseHandler = require("../responseHandler");
 const create = joi.object({
     name: joi.string().required(),
     username: joi.string().required(),

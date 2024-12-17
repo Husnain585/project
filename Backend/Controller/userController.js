@@ -1,7 +1,7 @@
 const { createUser, getAllUser, updateUser, deleteUser, get } = require("../models/userModel");
 const { hash } = require("bcryptjs");
 const { v4: uuid } = require("uuid");
-const responseHandler = require("../responsHandler");
+const responseHandler = require("../responseHandler");
 const { response } = require("express");
 
 module.exports = {

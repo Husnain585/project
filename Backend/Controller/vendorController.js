@@ -1,5 +1,5 @@
 const {createVendor} = require("../models/vendorModel");
-const responseHandler = require("../responsHandler");
+const responseHandler = require("../responseHandler");
 
 module.exports = {
     create: async (req, res) => {

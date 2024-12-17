@@ -1,5 +1,5 @@
 const { createProduct, getAllProduct, getOneProduct, updateProduct, deleteProduct} = require("../Models/productModel");
-const responseHandler = require("../responsHandler");
+const responseHandler = require("../responseHandler");
 
 module.exports = {
     create: async (req, res) => {

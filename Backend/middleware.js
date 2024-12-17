@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { verify } = require("jsonwebtoken");
-const responseHandler = require("./responsHandler");
+const responseHandler = require("./responseHandler");
 
 module.exports = {
   middleWare: async (req, res, next) => {

@@ -17,7 +17,6 @@ const Index = () => {
           >
             Product Section
           </Link>
-          
         </div>
       </div>
     </div>

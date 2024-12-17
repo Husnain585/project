@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const userModel = require("./routes/userRouter");
-const auth = require("./routes/authRouter");
+const authRouter = require("./routes/authRouter");
 const vendorRouter = require("./routes/vendorRouter");
 const productRouter = require("./routes/productRouter");
 const { db } = require("./models/index");
@@ -20,7 +20,7 @@ app.use(cors({
 }));
 app.use(morgan("dev"));
 app.use("/users", userModel);
-app.use("/auth", auth);
+app.use("/auth", authRouter);
 app.use("/vendor", vendorRouter);
 app.use("/product", productRouter);
 
@@ -38,3 +38,4 @@ db.connection
         console.log(error);
         console.log("unable to connect");
     })
+
