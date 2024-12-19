@@ -1,26 +1,38 @@
-import React from 'react'
+import React from 'react';
 import NavBar from './nav-bar';
-const Layout = ( {children}) => {
-return (
-  <>
-  <div className="w-full h-screen flex flex-col">
-  <div>
-    <NavBar />
-  </div>
-  
-  <div className="flex">
+import Footer from './footer';
+import WhyChooseUs from './whyChoose';
+import Header from './header';
+import CounterUp from './counterFunction';
 
+const Layout = ({children}) => {
+  return (
+    <>
+      <div className="w-full min-h-screen flex flex-col">
+        {/* Header */}
+        <div className="reltive  w-full z-50">
+          <NavBar />
+        </div>
 
-    {/* Main Content */}
-    <div className="w-full h-screen  relative top-20">
-      {children}
-    </div>
-  </div>
-</div>
+        {/* Main Content */}
+        <div className="flex-1 mt-20">
+          {children}
+          <Header/>
 
-  </>
-)
+          {/* WhyChooseUs Section */}
+          <div className="mt-12">
+            <WhyChooseUs />
+          </div>
+          <CounterUp/>
+        </div>
 
+        {/* Footer */}
+        <div className="w-full">
+          <Footer />
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default Layout;

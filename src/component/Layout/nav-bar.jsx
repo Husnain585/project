@@ -5,9 +5,9 @@ import { Link } from "react-router-dom";
 
 const NavBar = () => {
   return (
-    <header className="w-full absolute bg-gray-600 flex flex-wrap items-center justify-between px-6 py-4">
+    <header className="w-full absolute bg-white flex flex-wrap items-center justify-between px-6 py-4">
       {/* Logo */}
-      <a href="/index" className="text-white text-xl font-semibold">
+      <a href="/index" className="text-green-500 text-2xl px-9 font-semibold">
         My E-Store
       </a>
 
@@ -16,7 +16,7 @@ const NavBar = () => {
         <li>
           <Link
             href="/index"
-            className="text-white hover:text-yellow-300 transition-colors" to="/index"
+            className="text-black  font-semibold hover:text-green-200 transition-colors" to="/index"
           >
             Home
           </Link>
@@ -24,7 +24,7 @@ const NavBar = () => {
         <li>
           <a
             href="/admin"
-            className="text-white hover:text-yellow-300 transition-colors"
+            className="text-black font-semibold hover:text-green-200 transition-colors"
           >
             Admin
           </a>
@@ -32,7 +32,7 @@ const NavBar = () => {
         <li>
           <a
             href="/shopping"
-            className="text-white hover:text-yellow-300 transition-colors"
+            className="text-black font-semibold hover:text-green-200 transition-colors"
           >
             Shopping
           </a>
@@ -40,7 +40,7 @@ const NavBar = () => {
         <li>
           <a
             href="#"
-            className="text-white hover:text-yellow-300 transition-colors"
+            className="text-black font-semibold  hover:text-green-200 transition-colors"
           >
             Latest 
           </a>
@@ -48,7 +48,7 @@ const NavBar = () => {
         <li>
           <a
             href="#"
-            className="text-white hover:text-yellow-300 transition-colors"
+            className="text-black font-semibold hover:text-green-200 transition-colors"
           >
             My List
           </a>

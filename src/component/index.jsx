@@ -9,7 +9,7 @@ const Index = () => {
          
         >
           <h1 className="text-gray-800 text-4xl md:text-6xl capitalize mb-4">
-            Welcome to <strong className="text-pink-500">Explore</strong>
+            Welcome to <strong className="text-green-500">Explore</strong>
           </h1>
           <Link
             to="/product"
