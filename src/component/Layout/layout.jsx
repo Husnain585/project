@@ -4,6 +4,8 @@ import Footer from './footer';
 import WhyChooseUs from './whyChoose';
 import Header from './header';
 import CounterUp from './counterFunction';
+import ProductDetails from "../productLayout/productDetails"
+import Card from "../productLayout/shoeProduct"
 
 const Layout = ({children}) => {
   return (
@@ -18,6 +20,8 @@ const Layout = ({children}) => {
         <div className="flex-1 mt-20">
           {children}
           <Header/>
+          <ProductDetails/>
+          <Card/>
 
           {/* WhyChooseUs Section */}
           <div className="mt-12">
