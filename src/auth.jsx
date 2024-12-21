@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import Signup from './component/Auth/signup';
-import Login from './component/Auth/login';
+import Signup from './Features/Auth/signupForm';
+import Login from './Features/Auth/LoginForm';
 
 const Auth = () => {
     const [auth, setAuth] = useState("login");

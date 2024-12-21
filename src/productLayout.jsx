@@ -1,30 +1,4 @@
-  // import React from "react";
-  // import ProductDetail from "./component/productLayout/productDetails";
-  // import Card from "./component/productLayout/shoeProduct";
-  // import FeaturedProducts from "./component/productLayout/featureProduct";
-  // import CategoriesOfTheMonth from "./component/productLayout/topOfMonth";
-  // import BannerHero from "./component/productLayout/banner";
-  // import Footer from "./component/Layout/footer";
-  // import { Routes, Route } from "react-router-dom";
-
-
-  // const productLayout = () => {
-  //     return(<>
-  //         <div className="w-full">
-  //               <BannerHero />
-  //               <FeaturedProducts />
-  //               <CategoriesOfTheMonth />
-  //               <Footer />
-  //               <Routes>
-  //                 <Route path="/shop" element={<Card /> }/>
-  //               </Routes>
-  //         </div>
-  //     </>)  
-  // };
-
-  // export default productLayout;
-
-  import React from "react";
+import React from "react";
 import ProductDetail from "./component/productLayout/productDetails";
 import Card from "./component/productLayout/shoeProduct";
 import FeaturedProducts from "./component/productLayout/featureProduct";

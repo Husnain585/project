@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Auth from "./Auth";
+import AuthLayout from "./Layout/authLayout"
 import Index from "./component/index";
 import Product from "./Product";
 import GetProduct from "./component/product/getProduct";
@@ -8,6 +9,9 @@ import CreateProduct from "./component/product/CreateProduct";
 import Layout from "./component/Layout/layout";
 import AdminDashboard from "./component/product/AdminPage";
 import ProductLayout from "./productLayout";
+import MainLayout from "./Layout/mainLayout"
+import Home from "./Pages/Home"
+import ShopLayout from "./Layout/ShoppingLayout"
 
 const App = () => {
   const location = useLocation();
@@ -17,21 +21,20 @@ const App = () => {
     <div className="flex flex-col justify-center items-center h-full w-full">
       {isAuthPath ? (
         <Routes>
-          <Route index element={<Auth />} />
+          <Route index element={<AuthLayout />} />
         </Routes>
       ) : (
-        <Layout>
+        
+        <MainLayout>
           <Routes>
             <Route path="index" element={<Index />} />
-            <Route path="admin" element={<AdminDashboard />} />
-            <Route path="shopping" element={<ProductLayout />}>
-              <Route index path="product" element={<Product />} />
-              <Route path="create-product" element={<CreateProduct />} />
-              <Route path="get-product" element={<GetProduct />} />
-            </Route>
+            <Route path="Home" element={<Home/>}/>
           </Routes>
-        </Layout>
-      )}
+        </MainLayout>
+         
+
+      )
+      }
     </div>
   );
 };
