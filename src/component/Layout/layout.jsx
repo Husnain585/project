@@ -1,39 +1,24 @@
-import React from 'react';
-import NavBar from './nav-bar';
-import Footer from './footer';
-import WhyChooseUs from './whyChoose';
-import Header from './header';
-import CounterUp from './counterFunction';
-import ProductDetails from "../productLayout/productDetails"
-import Card from "../productLayout/shoeProduct"
+import React from "react";
+import WhyChooseUs from "./whyChoose";
+import Header from "./header";
+import CounterUp from "./counterFunction";
 
-const Layout = ({children}) => {
+const Layout = ({ children }) => {
   return (
-    <>
-      <div className="w-full min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="reltive  w-full z-50">
-          <NavBar />
-        </div>
+    <div className="w-full min-h-screen flex flex-col">
+      {/* Main Content */}
+      <div className="flex-1 mt-20">
+        {children}
 
-        {/* Main Content */}
-        <div className="flex-1 mt-20">
-          {children}
-          <Header/>
+        <Header />
 
-          {/* WhyChooseUs Section */}
-          <div className="mt-12">
-            <WhyChooseUs />
-          </div>
-          <CounterUp/>
+        {/* WhyChooseUs Section */}
+        <div className="mt-12">
+          <WhyChooseUs />
         </div>
-
-        {/* Footer */}
-        <div className="w-full">
-          <Footer />
-        </div>
+        <CounterUp />
       </div>
-    </>
+    </div>
   );
 };
 
