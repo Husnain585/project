@@ -1,10 +1,9 @@
 import React from "react";
-import ProductDetail from "./component/productLayout/productDetails";
-import Card from "./component/productLayout/shoeProduct";
-import FeaturedProducts from "./component/productLayout/featureProduct";
-import CategoriesOfTheMonth from "./component/productLayout/topOfMonth";
-import BannerHero from "./component/productLayout/banner";
-import Footer from "./component/Layout/footer";
+import ProductDetail from "./Features/productLayout/productDetails";
+import Card from "./Features/productLayout/shoeProduct";
+import FeaturedProducts from "./Features/productLayout/featureProduct";
+import CategoriesOfTheMonth from "./Features/productLayout/topOfMonth";
+import BannerHero from "./Features/productLayout/banner";
 import { Routes, Route } from "react-router-dom";
 
 const ProductLayout = () => {
@@ -33,9 +32,6 @@ const ProductLayout = () => {
           }
         />
       </Routes>
-
-      {/* Footer */}
-      {/* <Footer /> */}
     </div>
   );
 };

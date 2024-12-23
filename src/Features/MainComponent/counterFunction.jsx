@@ -1,4 +1,7 @@
 import React, { useEffect } from "react";
+import { FaTruck } from "react-icons/fa";
+import { FaArrowTrendUp, FaGift} from "react-icons/fa6";
+import { FaHandHolding } from "react-icons/fa6";
 
 const CounterUp = () => {
   const counterUp = (element, options) => {
@@ -48,27 +51,31 @@ const CounterUp = () => {
          {/* Spacer */}
         <div className="bg-gray-100  p-4 text-center rounded shadow-xl ">
           <h5 className="text-2xl font-bold text-blue-500" id="counter1">
-            2411855
+            720 
           </h5>
-          <p className="text-gray-700">Confirmed Cases</p>
+          <FaGift  className="relative text-blue-500 left-44 bottom-6 scale-150"/>
+          <p className="text-gray-700 font-semibold">  Products</p>
         </div>
         <div className="bg-gray-100 p-4 text-center rounded shadow-xl">
           <h5 className="text-2xl font-bold text-blue-500" id="counter2">
-            2411855
+            4920
           </h5>
-          <p className="text-gray-700">Confirmed Cases</p>
+          <FaHandHolding  className="relative text-blue-500 left-44 bottom-6 scale-150"/>
+          <p className="text-gray-700 font-semibold">Sales</p>
         </div>
         <div className="bg-gray-100 p-4 text-center rounded shadow-xl">
           <h5 className="text-2xl font-bold text-blue-500" id="counter3">
-            2411855
+              3899
           </h5>
-          <p className="text-gray-700">Confirmed Cases</p>
+          <FaTruck  className="relative text-blue-500 left-44 bottom-6 scale-150"/>
+          <p className="text-gray-700 font-semibold">Delivery</p>
         </div>
         <div className="bg-gray-100 p-4 text-center rounded shadow-xl">
           <h5 className="text-2xl font-bold text-blue-500" id="counter4">
-            2411855
+            25
           </h5>
-          <p className="text-gray-700">Confirmed Cases</p>
+          <FaArrowTrendUp  className="relative text-blue-500 left-40 bottom-5 scale-150"/>
+          <p className="text-gray-700 font-semibold">increase</p>
         </div>
         <div></div> {/* Spacer */}
       </div>

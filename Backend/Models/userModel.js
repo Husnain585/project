@@ -17,7 +17,7 @@ module.exports = {
     getAllUser : async () => {
         try {
             const user = await models.users.findAll({
-                attributes: ["userId" ,"name", "username", "email"], // to select specfic data member from database
+                attributes: ["userId" ,"name", "username", "email", "password"], // to select specfic data member from database
                 // attributes: {
                 //     exclude: ["password", "createdAt", "updatedAt"],    // remove specific datamember 
                 // },

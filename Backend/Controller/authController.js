@@ -19,12 +19,12 @@ module.exports = {
       }
       const isValid = await compare(password,response.response.dataValues.password);
       if (!isValid) {
-        res.cookie("auth", undefined, { maxAge: 10000 });
+        res.cookie("auth", undefined, { maxAge: 60000 });
         return responseHandler(res, { error: "Invalid Username or Password" });
         }
       delete response.response.dataValues.password;
-      const token = sign(response.response.dataValues, process.env.SECRET, {expiresIn: 10,});
-      res.cookie("auth", token, { maxAge: 10000 });
+      const token = sign(response.response.dataValues, process.env.SECRET, {expiresIn: 3600});
+      res.cookie("auth", token, { maxAge:  3600000 });
       return responseHandler(res, { response: token, redirect: "/index" });
     } catch (error) {
       return responseHandler(res, { error: error });

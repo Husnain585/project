@@ -11,14 +11,14 @@ const cors = require("cors");
 
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cookieParser())
+app.use(cookieParser());
+app.use(morgan("dev"));
 app.use(cors({
     origin: true,
     credentials: true,
 }));
-app.use(morgan("dev"));
 app.use("/users", userModel);
 app.use("/auth", authRouter);
 app.use("/vendor", vendorRouter);

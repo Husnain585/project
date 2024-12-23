@@ -25,10 +25,10 @@ module.exports = {
         include:
         {
           model: models.vendors,
-          as: "vendor",
+          as: "vendors",
           attributes: ["vendorId", "username"],
         },
-
+        
       });
       return {
         response: product,

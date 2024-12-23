@@ -8,15 +8,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Section */}
           <div>
-            <h4 className="text-gray-700 text-lg font-semibold mb-4 relative">
+            <h4 className="text-blue-500 text-lg font-semibold mb-4 relative">
               Company
-              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-green-500"></span>
+              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-blue-300"></span>
             </h4>
             <ul className="space-y-2">
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   About us
                 </a>
@@ -24,7 +24,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Our services
                 </a>
@@ -32,7 +32,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Privacy policy
                 </a>
@@ -40,7 +40,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Affiliated program
                 </a>
@@ -50,9 +50,9 @@ const Footer = () => {
 
           {/* Get Help Section */}
           <div>
-            <h4 className="text-gray-700 text-lg font-semibold mb-4 relative">
+            <h4 className="text-blue-500 text-lg font-semibold mb-4 relative">
               Get Help
-              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-green-500"></span>
+              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-blue-300"></span>
             </h4>
             <ul className="space-y-2">
               <li>
@@ -66,7 +66,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Shipping
                 </a>
@@ -74,7 +74,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Returns
                 </a>
@@ -82,7 +82,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Order status
                 </a>
@@ -90,7 +90,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Payment options
                 </a>
@@ -100,15 +100,15 @@ const Footer = () => {
 
           {/* Online Shop Section */}
           <div>
-            <h4 className="text-gray-700 text-lg font-semibold mb-4 relative">
+            <h4 className="text-blue-500 text-lg font-semibold mb-4 relative">
               Online Shop
-              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-green-500"></span>
+              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-blue-300"></span>
             </h4>
             <ul className="space-y-2">
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Watch
                 </a>
@@ -116,7 +116,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Bag
                 </a>
@@ -124,7 +124,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Shoes
                 </a>
@@ -132,7 +132,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-blue-500 hover:text-gray-900 pl-2 "
+                  className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   Dress
                 </a>
@@ -142,9 +142,9 @@ const Footer = () => {
 
           {/* Social Links Section */}
           <div>
-            <h4 className="text-gray-700 text-lg font-semibold mb-4 relative">
+            <h4 className="text-blue-500 text-lg font-semibold mb-4 relative">
               Follow Us
-              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-green-500"></span>
+              <span className="absolute left-0 bottom-0 w-12 h-0.5 bg-blue-300"></span>
             </h4>
             <div className="flex space-x-4">
               <a

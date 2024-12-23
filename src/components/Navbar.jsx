@@ -7,7 +7,8 @@ const Navbar = () => {
   return (
     <header className="w-full absolute bg-white flex flex-wrap items-center justify-between px-6 py-4">
       {/* Logo */}
-      <Link to="index" className="text-green-500 text-2xl px-9 font-semibold">
+      <Link to="index" className="text-3xl px-9 font-extrabold text-gradient bg-gradient-to-r from-blue-500 to-green-500 text-transparent bg-clip-text">
+      <span className="absolute left-16 top-14  w-36 h-1 text-gradient bg-gradient-to-r from-blue-500 to-green-500 text-transparent"></span>
         My E-Store
       </Link>
 
@@ -16,7 +17,7 @@ const Navbar = () => {
         <li>
           <Link
             href="index"
-            className="text-gray-700 font-semibold hover:text-green-300" to="/index"
+            className="text-blue-500 font-semibold hover:text-[#61A4Ad]" to="/index"
           >
             Home
           </Link>
@@ -24,15 +25,23 @@ const Navbar = () => {
         <li>
           <Link
           to="for-you"
-            className="text-gray-700 font-semibold hover:text-green-300"
+            className="text-blue-500 font-semibold hover:text-[#61A4Ad]"
           >
             ForYou
           </Link>
         </li>
         <li>
           <Link
+            to="product"
+            className="text-blue-500 font-semibold hover:text-[#61A4Ad]"
+          >
+            product
+          </Link>
+        </li>
+        <li>
+          <Link
             to="admin"
-            className="text-gray-700 font-semibold hover:text-green-300"
+            className="text-blue-500 font-semibold hover:text-[#61A4Ad]"
           >
             Admin
           </Link>
@@ -40,7 +49,7 @@ const Navbar = () => {
         <li>
           <Link
           to="shopping"
-            className="text-gray-700 font-semibold hover:text-green-300"
+            className="text-blue-500 font-semibold hover:text-[#61A4Ad]"
           >
             Shopping
           </Link>
@@ -48,7 +57,7 @@ const Navbar = () => {
         <li>
           <Link
           to="about"
-            className="text-gray-700 font-semibold hover:text-green-300"
+            className="text-blue-500 font-semibold hover:text-[#61A4Ad]"
           >
             About Us 
           </Link>
@@ -56,7 +65,7 @@ const Navbar = () => {
         <li>
           <Link
           to="contact"
-            className="text-gray-700 font-semibold hover:text-green-300"
+            className="text-blue-500 font-semibold hover:text-[#61A4Ad]"
           >
             Contact
           </Link>
@@ -68,9 +77,9 @@ const Navbar = () => {
         <input
           type="text"
           placeholder="Search"
-          className="bg-transparent border border-gray-700 text-gray-700 placeholder-gray-700   py-2 px-4 pl-10 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+          className="bg-transparent border border-blue-700 text-gray-700 placeholder-blue-700   py-2 px-4 pl-10 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
         />
-        <i className="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-700"><FaSearch /></i> 
+        <i className="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-700"><FaSearch /></i> 
       </div>
     </header>
   );
