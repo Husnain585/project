@@ -6,6 +6,7 @@ const userModel = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
 const vendorRouter = require("./routes/vendorRouter");
 const productRouter = require("./routes/productRouter");
+const cartRouter = require("./routes/cartRouter");
 const { db } = require("./models/index");
 const cors = require("cors");
 
@@ -23,6 +24,7 @@ app.use("/users", userModel);
 app.use("/auth", authRouter);
 app.use("/vendor", vendorRouter);
 app.use("/product", productRouter);
+app.use("/cart", cartRouter);
 
 
 

@@ -9,7 +9,7 @@ const GetProduct = () => {
         withCredentials: true,
       });
       if (data.data.length > 0) {
-        setData(data.data);
+        setData(data.data); 
       }
       console.log(data);
     } catch (error) {

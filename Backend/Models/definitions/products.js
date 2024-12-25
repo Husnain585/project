@@ -1,7 +1,9 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../../dbConnection");
 const { v4: uuid } = require("uuid");
+
 const vendors = require("./vendor");
+const cart = require("./cart");
 
 class Products extends Model { }
 
@@ -25,6 +27,14 @@ Products.init(
             references: {
                 model: vendors,
                 key: "vendorId",
+            },
+        },
+        cartId: {
+            type: DataTypes.STRING(1000),
+            allowNull: false,
+            references: {
+                model: cart,
+                key: "cartId",
             },
         },
     },

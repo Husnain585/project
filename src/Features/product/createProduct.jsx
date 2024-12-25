@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const CreateProduct = () => {
   const [name, setName] = useState("");
   const [vendorId, setVendorId] = useState("");
+  const [cartId, setCartId] = useState("");
   const [description, setDesc] = useState("");
   const navigate = useNavigate();
   const imageUpload = useRef();
@@ -16,6 +17,7 @@ const CreateProduct = () => {
         name,
         description,
         vendorId,
+        cartId  
       },
       {
         withCredentials: true,
@@ -83,6 +85,15 @@ const CreateProduct = () => {
                 onChange={(e) => setVendorId(e.target.value)}
                 type="text"
                 placeholder="Enter Vendor ID"
+                className="w-full p-3 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="text-gray-700 font-semibold text-lg">Cart ID</label>
+              <input
+                onChange={(e) => setCartId(e.target.value)}
+                type="text"
+                placeholder="Enter Cart ID"
                 className="w-full p-3 rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

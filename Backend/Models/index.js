@@ -8,6 +8,7 @@ const products = require("./definitions/products");
 const productVariations = require("./definitions/productsVariations");
 const attributes = require("./definitions/attributes");
 const variationsHasAttribute = require("./definitions/variationHasAttributes");
+const cart = require("./definitions/cart");
 
 const models = {
   users,
@@ -18,6 +19,7 @@ const models = {
   productVariations,
   attributes,
   variationsHasAttribute,
+  cart
 };
 
 //  1:M relation between Product & Vendors
@@ -35,6 +37,14 @@ variationsHasAttribute.belongsTo(productVariations, {foreignKey: "productVariati
 
 attributes.hasMany(variationsHasAttribute, {foreignKey: "attributeId ", as: "variationsHasAttribute"});
 variationsHasAttribute.belongsTo(attributes, {foreignKey: "attributeId", as: "attributes"});
+
+users.hasOne(cart, { foreignKey: "userId", as: "cart" });
+cart.belongsTo(users, { foreignKey: "userId", as: "user" });
+
+cart.belongsToMany(products, { through: "cart_products", foreignKey: "cartId", as: "products" });
+products.belongsToMany(cart, { through: "cart_products", foreignKey: "productId", as: "carts" });
+
+
 
 const db = {};
 db.connection = connection;
