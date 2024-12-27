@@ -111,7 +111,7 @@ const CreateProduct = () => {
                 productCreate();
               }}
               disabled={!(name && description)}
-              className="w-2/6 text-center relative left-40 bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 rounded-lg font-semibold hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="w-2/6 text-center relative top-[-60px] left-40 bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 rounded-lg font-semibold hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               Create Product
             </button>

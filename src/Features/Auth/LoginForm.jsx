@@ -23,7 +23,7 @@ const Login = ({ setAuth }) => {
       });
         console.log(data);
       if (data.status === 200) {
-        const token = data.data.token;
+        const token = data.data.token;a
         localStorage.setItem('authToken', token);
         if(token == token){
           navigate('/index');
