@@ -3,7 +3,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import Auth from "./Auth";
 import Product from "./Product";
 import GetProduct from "./Features/product/getProduct";
-import CreateProduct from "./Features/product/CreateProduct";
+import CreateProduct from "./Features/product/createProduct";
 import AdminDashboard from "./Features/product/AdminPage";
 import ProductLayout from "./productLayout";
 import MainLayout from "./Layout/mainLayout";

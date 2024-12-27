@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+const path = require("path");
 const userModel = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
 const vendorRouter = require("./routes/vendorRouter");
@@ -14,6 +15,8 @@ const cors = require("cors");
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(cors({
