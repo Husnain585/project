@@ -140,6 +140,7 @@ import { useNavigate } from "react-router-dom";
 
 const CreateProduct = () => {
   const [name, setName] = useState("");
+  const [product, setProduct] = useState("");
   const [vendorId, setVendorId] = useState("");
   const [cartId, setCartId] = useState("");
   const [description, setDesc] = useState("");
@@ -147,30 +148,47 @@ const CreateProduct = () => {
   const navigate = useNavigate();
   const imageUpload = useRef();
 
+  const handleImageSelection = (e) => {
+    const file = e.target.files[0];
+    const imageURL = URL.createObjectURL(file);
+
+    // Store the URL in state and localStorage
+    setProdImg(imageURL);
+    localStorage.setItem("uploadedImageUrl", imageURL);
+
+    console.log("Image File Selected:", file);
+    console.log("Image URL Stored in LocalStorage:", imageURL);
+  };
+
   const productCreate = async () => {
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
-    formData.append("vendorId", vendorId);
-    formData.append("cartId", cartId);
-    if (prodImg) {
-      formData.append("image", prodImg);
-    }
+    // Retrieve image URL from localStorage
+    const storedImageUrl = localStorage.getItem("uploadedImageUrl");
+
+    // Create payload with image URL
+    const payload = {
+      name,
+      description,
+      vendorId,
+      cartId,
+      product,
+      imageUrl: storedImageUrl, // Sending the image URL to the backend
+    };
 
     try {
       const { data } = await axios.post(
         "http://localhost:3000/product/create",
-        formData,
+        payload,
         {
           withCredentials: true,
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
 
       if (data.success) {
         alert("Product created successfully");
+        localStorage.removeItem("uploadedImageUrl"); // Clean up localStorage
         navigate("/product/get");
       } else {
         alert(data.error);
@@ -183,45 +201,34 @@ const CreateProduct = () => {
 
   return (
     <div className="w-full h-screen flex justify-center items-center relative overflow-hidden">
-      {/* Particle Effect Background */}
       <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-50 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-tl from-white/10 to-transparent mix-blend-overlay" />
       </div>
 
-      {/* Glassmorphic Container */}
       <div className="container h-auto top-5 relative z-10 bg-black/10 backdrop-blur-md rounded-s-full rounded-e-full shadow-xl p-10 border border-white/40">
         <h1 className="text-4xl font-bold capitalize mb-8 bg-gradient-to-r from-blue-500 to-green-500 text-transparent bg-clip-text drop-shadow-lg text-center">
           Create Product
         </h1>
 
-        {/* Form and Image Section */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-12">
-          {/* Image Upload Section */}
           <div className="flex flex-col items-center gap-4">
             <div
               className="rounded-full bg-gradient-to-r from-gray-300 via-gray-200 to-gray-100 w-36 h-36 flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-400 hover:border-gray-600"
               onClick={() => imageUpload.current.click()}
             >
               <span className="text-sm text-gray-500">
-                {prodImg ? `Image Selected`  : "Add Picture"}
+                {prodImg ? `Image Selected` : "Add Picture"}
               </span>
               <input
                 className="hidden"
                 type="file"
                 accept="image/*"
                 ref={imageUpload}
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  const imageURL = URL.createObjectURL(file);
-                  setProdImg(imageURL);
-                  console.log("Image File Selected:", file);
-                  console.log("ImageURL Selected:", imageURL);
-                }}
+                onChange={handleImageSelection}
               />
             </div>
           </div>
 
-          {/* Form Section */}
           <div className="flex flex-col gap-6 md:w-3/6">
             <div>
               <label className="text-gray-700 font-semibold text-lg">Name</label>

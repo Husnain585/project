@@ -5,13 +5,10 @@ import Footer from "../components/Footer";
 const MainLayout = ({ children }) => {
   return (
     <>
-      <div className="w-full flex flex-col">
-        {/* Header */}
-        <div className="reltive  w-full z-50">
+      <div className="w-full  flex flex-col">
           <Navbar />
-        </div>
         {children}
-      </div>
+        </div>
       {/* Footer */}
       <div className="w-full relative top-10">
         <Footer />
