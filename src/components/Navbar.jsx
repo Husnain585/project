@@ -15,7 +15,7 @@ const Navbar = () => {
       >
         My E-Store
       </Link>
-
+      {/* nothing to be yet done */}
       {/* Hamburger Menu for Small Screens */}
       <button
         className="text-blue-500 text-2xl md:hidden"
