@@ -9,7 +9,7 @@ import Testimonials from "../Features/MainComponent/Testimonials";
 const Home = ({ children }) => {
   return (
     <div className="w-full min-h-screen flex flex-col">
-      <div className="flex-1 mt-20">
+      <div className="flex-1">
         {children}
         <Banner />
         <WhyTrustUs/>
