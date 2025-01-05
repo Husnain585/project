@@ -7,12 +7,13 @@ import CreateProduct from "./Features/product/createProduct";
 import AdminDashboard from "./Features/product/AdminPage";
 import ProductLayout from "./productLayout";
 import MainLayout from "./Layout/mainLayout";
-import Home from "./Pages/Home";
+import Home from "./Pages/Home";   
 import About from "./Pages/About";
 import ContactSection from "./Pages/Contact";
 import ProductDetail from "./Features/productLayout/productDetails";
 
 const App = () => {
+  const inset = useLocation();
   const location = useLocation();
   const isAuthPath = location.pathname === "/";
 
