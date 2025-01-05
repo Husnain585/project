@@ -1,0 +1,15 @@
+@keyframes appear {
+    from 0% {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    to 100% {
+        opacity: 1;
+        transform: translateX(0px);
+    }
+}
+.appear{
+    animation: appear  linear;
+    animation-timeline: view();
+    animation-range: entry 0% cover 40%;    
+}
