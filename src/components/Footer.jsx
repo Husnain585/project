@@ -15,7 +15,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="#"
+                  href="/about"
                   className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
                   About us
@@ -23,26 +23,26 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/shopping"
                   className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
-                  Our services
+                  Our product
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/for-you"
                   className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
-                  Privacy policy
+                  Buy
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/contact"
                   className="text-blue-500 hover:text-[#61A4Ad] pl-2 "
                 >
-                  Affiliated program
+                  Contact
                 </a>
               </li>
             </ul>
