@@ -13,7 +13,6 @@ import ContactSection from "./Pages/Contact";
 import ProductDetail from "./Features/productLayout/productDetails";
 
 const App = () => {
-  const inset = useLocation();
   const location = useLocation();
   const isAuthPath = location.pathname === "/";
 

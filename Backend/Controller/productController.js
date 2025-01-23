@@ -13,9 +13,10 @@ module.exports = {
     },
     getAll: async (req, res) => {
         try {
-          vendorId = "59d93ece-26e7-4ef1-8af2-804af785a6a8";
+          vendorId = "6cd84664-c003-4a42-a632-bad4294cdb03";
             const response = await getAllProduct(vendorId);
             return responseHandler(res, response);
+            // console.log(response);
         } catch (error) {
             return responseHandler(res, {response: error});
         }

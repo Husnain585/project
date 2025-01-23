@@ -136,7 +136,7 @@
 
 import { useRef, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const CreateProduct = () => {
   const [name, setName] = useState("");
@@ -270,13 +270,14 @@ const CreateProduct = () => {
                 rows="4"
               ></textarea>
             </div>
-            <button
+            <Link
               onClick={productCreate}
               disabled={!(name && description)}
+              to="http://localhost:5173/product/get" 
               className="w-2/6 text-center relative top-[-60px] left-40 bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 rounded-lg font-semibold hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               Create Product
-            </button>
+            </Link>
           </div>
         </div>
       </div>

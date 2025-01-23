@@ -22,10 +22,3 @@ const Home = ({ children }) => {
 };
 
 export default Home;
-
-
-
-/* Optional Intersection Observer for better support */
-/* .appear.observed {
-    animation: appear 1s ease-out both;
-} */

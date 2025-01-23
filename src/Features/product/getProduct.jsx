@@ -11,7 +11,7 @@ const GetProduct = () => {
       if (data.data.length > 0) {
         setData(data.data); 
       }
-      console.log(data);
+      console.log(data.data);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("Axios Error:", error.message);
@@ -28,24 +28,23 @@ const GetProduct = () => {
 
   return (
     <>
-      <div className="relative top-20  w-[99%] h-screen scrollbar-thumb-blue-500 scrollbar-track-gray-300 gap-y-3 overflow-visible flex flex-wrap overflow-y-scroll scrollbar-thin  gap-x-2 p-2">
-        {data.length > 0 ?
-          (<>
-            {data.map((user, Index, vendorId) => {
-              return (
-                <div
-                  key={Index}
-                  className="w-[32%] h-[28%]  rounded-md flex justify-center bg-gray-700 items-center">
-                  <div className="">
-                    <h6 className='text-gray-300 text-2xl flex justify-center items-center font-normal'>Product details</h6>
-                    <p className=' text-white text-normal flex justify-center items-center font-normal'> product Name:  {user.name}</p>
-                    <p className=' text-white text-normal flex justify-center items-center font-normal'>Product Description:  {user.description}</p>
-                    <p className=' text-white text-normal flex justify-center items-center font-normal '>ProductId: {user.productId}</p>
-                    <p className=' text-white text-normal flex justify-center items-center font-normal '>VendorId: {user.vendor?.vendorId}</p>
-                  </div>
-                </div>
-              )
-            })}
+      <div className="relative top-20 w-full h-screen overflow-y-scroll scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-gray-300 flex flex-wrap gap-2 p-2">
+  {data.length > 0 ? (
+    <>
+      {data.map((user, Index) => {
+        return (
+          <div
+            key={Index}
+            className="w-full md:w-[48%] lg:w-[32%] lg:h-[43%] h-auto rounded-md flex justify-center bg-gray-700 items-center p-4">
+            <div className="text-center">
+              <h6 className='text-gray-300 text-2xl font-normal mb-2'>Product details</h6>
+              <p className='text-white font-normal'>Product Name: {user.name}</p>
+              <p className='text-white font-normal'>Product Description: {user.description}</p>
+              <p className='text-white font-normal'>ProductId: {user.productId}</p>
+            </div>
+          </div>
+        );
+      })}
           </>
           ) : (
             <>
@@ -53,7 +52,6 @@ const GetProduct = () => {
             </>)}
 
       </div>
-
     </>)
 }
 export default GetProduct;
