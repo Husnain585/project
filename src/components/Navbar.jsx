@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import Login from "../Features/Auth/LoginForm";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const isUser = "";
+  let username = Login.username;
   return (
     <>
     <div className="w-full bg-white flex items-center justify-between px-6 py-4 shadow-md">
@@ -55,7 +57,8 @@ const Navbar = () => {
               Product
             </Link>
           </li>
-          <li>
+            {username ? (<>
+              <li>
             <Link
               to="/admin"
               className="block px-4 py-2 text-blue-500 font-semibold hover:text-[#61A4Ad]"
@@ -63,7 +66,8 @@ const Navbar = () => {
               Admin
             </Link>
           </li>
-          <li>
+            </>) : (<>
+              <li>
             <Link
               to="/shopping"
               className="block px-4 py-2 text-blue-500 font-semibold hover:text-[#61A4Ad]"
@@ -71,6 +75,7 @@ const Navbar = () => {
               Shopping
             </Link>
           </li>
+            </>)}
           <li>
             <Link
               to="/about"

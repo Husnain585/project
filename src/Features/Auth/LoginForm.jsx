@@ -140,17 +140,24 @@ const Login = ({ setAuth }) => {
           <div className="flex gap-10">
             <button
               type="button"
-              className="block text-center text-white uppercase text-sm tracking-wide hover:underline"
+              className="block text-center text-white uppercase text-xs tracking-tighter hover:underline"
               // Replace with appropriate functionality
             >
               Forgot password
             </button>
             <button
               type="button"
-              className="block text-center text-white uppercase text-sm tracking-wide hover:underline"
+              className="block text-center text-white uppercase text-xs tracking-tighter hover:underline"
               onClick={() => setAuth("signup")}
             >
               Signup
+            </button>
+            <button
+              type="button"
+              className="block text-center text-white uppercase text-xs tracking-tighter hover:underline"
+              onClick={() => setAuth("signup")}
+            >
+              Login As Admin
             </button>
           </div>
         </form>
