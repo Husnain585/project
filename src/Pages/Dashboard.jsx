@@ -16,7 +16,7 @@ const Dashboard = () => {
           </div>
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold text-gray-700">Settings</h2>
-            <p className="text-lg text-gray-500">Manage application settings</p>
+            <p className="text-lg text-gray-500">Mange application settings</p>
           </div>
         </div>
       </div>
