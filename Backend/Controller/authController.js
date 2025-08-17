@@ -17,9 +17,9 @@ module.exports = {
         res.cookie("auth", undefined, { maxAge: 60000 });
         return responseHandler(res,response.error ? response : { error: "No User Exists" });
       }
-      const isValid = await compare(password,response.response.dataValues.password);
+      const isValid = await compare(password,response.response.dataValues.password); 
       if (!isValid) {
-        res.cookie("auth", undefined, { maxAge: 60000 });
+        res.cookie("auth", undefined, { maxAge: 60000 }); 
         return responseHandler(res, { error: "Invalid Username or Password" });
         }
       delete response.response.dataValues.password;

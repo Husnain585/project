@@ -19,7 +19,6 @@ module.exports = {
             return responseHandler(res, response);
         } catch (error) {
             console.log("not working");
-            
             return responseHandler(res, {response: error});
         }
     },

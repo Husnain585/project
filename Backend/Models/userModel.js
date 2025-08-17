@@ -39,7 +39,7 @@ module.exports = {
     
             where: {
               ...(email != "false" ? { email: email } : { username: username }),
-            },
+            }, 
           });
     
           return {
