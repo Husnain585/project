@@ -9,14 +9,14 @@ class cart extends Model { }
 cart.init({
     cartId: {
         primaryKey: true,
-        type: DataTypes.STRING(100),
+        type: DataTypes.UUID,
     },
     userId: {
-        type: DataTypes.STRING(100),
+        type: DataTypes.UUID,
         allowNull: false,
         references: {
-            model: users,
-            key: "userId",
+            model: "users",
+            key: "userId"
         },
     },
 },

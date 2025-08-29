@@ -2,11 +2,11 @@ const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
 const { v4: uuid } = require("uuid");
 
-class Order extends Model {}
+class Review extends Model {}
 
-Order.init(
+Review.init(
   {
-    orderId: {
+    reviewId: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: uuid,
@@ -16,21 +16,20 @@ Order.init(
       allowNull: false,
       references: { model: "users", key: "userId" },
     },
-    status: {
-      type: DataTypes.ENUM("pending","paid","shipped","completed","cancelled"),
-      defaultValue: "pending",
+    productId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: { model: "products", key: "productId" },
     },
-    totalAmount: { type: DataTypes.DECIMAL(10,2), allowNull: false },
+    rating: { type: DataTypes.INTEGER, allowNull: false, validate: { min: 1, max: 5 } },
+    comment: { type: DataTypes.TEXT },
   },
   {
     sequelize: connection,
-    modelName: "Order",
-    tableName: "orders",
+    modelName: "Review",
+    tableName: "reviews",
     timestamps: true,
   }
 );
-Order.beforeCreate(async (cart) => {
-  Order.orderId = uuid();  
-});
 
-module.exports = Order;
+module.exports = Review;

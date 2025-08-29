@@ -1,25 +1,36 @@
 const { DataTypes, Model } = require("sequelize");
-const connection = require("../config/db.connection");
-const {v4: uuid} = require("uuid");
+const sequelize = require("../config/db.connection");
+const { v4: uuid } = require("uuid");
 
-class admin extends Model { }
+class Admin extends Model {}
 
-admin.init({
+Admin.init(
+  {
     adminId: {
-        primaryKey: true,
-        type: DataTypes.STRING(100),
-    }
-},
-    {
-        name: "admin",
-        timestamps: true,
-        paranoid: true,
-        sequelize: connection,
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: uuid,
     },
+    username: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.STRING(1000),
+      allowNull: false,
+    },
+    role: {
+      type: DataTypes.ENUM("superadmin", "manager", "support"),
+      defaultValue: "manager",
+    },
+  },
+  {
+    sequelize,
+    modelName: "Admin",
+    tableName: "admins",
+    timestamps: true,
+  }
 );
 
-admin.beforeCreate(async (admin) => {
-        admin.adminId =  await uuid();
-    });
-
-module.exports = admin;
+module.exports = Admin;
