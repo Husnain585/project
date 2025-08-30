@@ -13,10 +13,12 @@ const Review = require("./review");
 const Wishlist = require("./wishlist");
 const Address = require("./address");
 const Payment = require("./payment");
+const CartItem = require("./cartItem");
 
 // Attach models
 const models = {
   Cart: new Cart(sequelize),
+  CartItem : new CartItem(sequelize),
   Admin: new Admin(sequelize),
   User: new User(sequelize),
   Category: new Category(sequelize),
@@ -82,6 +84,13 @@ Review.belongsTo(Product, { foreignKey: "productId", as: "product" });
 // Users ↔ Addresses (one-to-many)
 User.hasMany(Address, { foreignKey: "userId", as: "addresses" });
 Address.belongsTo(User, { foreignKey: "userId", as: "user" });
+
+// Cartitems ↔ Products (many-to-one)
+Cart.hasMany(CartItem, { foreignKey: "cartId" });
+CartItem.belongsTo(Cart, { foreignKey: "cartId" });
+
+Product.hasMany(CartItem, { foreignKey: "productId" });
+CartItem.belongsTo(Product, { foreignKey: "productId" });
 
 // Build db object
 const db = {};

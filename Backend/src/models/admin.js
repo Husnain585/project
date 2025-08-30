@@ -1,18 +1,25 @@
 const { DataTypes, Model } = require("sequelize");
-const sequelize = require("../config/db.connection");
+const connection = require("../config/db.connection");
 const { v4: uuid } = require("uuid");
+const { hash } = require("bcryptjs");
 
-class Admin extends Model {}
+class Admin extends Model {
+  toJSON() {
+    const values = { ...this.get() };
+    delete values.password;
+    return values;
+  }
+}
 
 Admin.init(
   {
     adminId: {
       type: DataTypes.UUID,
       primaryKey: true,
-      defaultValue: uuid,
+      defaultValue: uuid, // UUIDv4
     },
     username: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(60),
       allowNull: false,
       unique: true,
     },
@@ -21,16 +28,22 @@ Admin.init(
       allowNull: false,
     },
     role: {
-      type: DataTypes.ENUM("superadmin", "manager", "support"),
-      defaultValue: "manager",
+      type: DataTypes.ENUM("superadmin", "admin"),
+      defaultValue: "admin",
     },
   },
   {
-    sequelize,
+    sequelize: connection,
     modelName: "Admin",
     tableName: "admins",
     timestamps: true,
+    paranoid: true,
   }
 );
+
+// Hook: hash password before create
+Admin.beforeCreate(async (admin) => {
+  admin.password = await hash(admin.password, 10);
+});
 
 module.exports = Admin;

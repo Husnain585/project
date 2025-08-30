@@ -1,0 +1,16 @@
+const router = require("express").Router();
+const authMiddleware = require("../middleware/authCheck.middleware");
+const {
+  createProductImage,
+  getProductImages,
+  deleteProductImage,
+} = require("../controller/productImage.controller");
+
+// Public route: Get all images of a product
+router.get("/:productId", getProductImages);
+
+// Protected routes (admin only)
+router.post("/", authMiddleware, createProductImage);
+router.delete("/:imageId", authMiddleware, deleteProductImage);
+
+module.exports = router;
