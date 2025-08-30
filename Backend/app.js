@@ -9,6 +9,7 @@ const port = process.env.PORT || 3000;
 
 // Import Routes
 const authRoutes = require("./src/routes/auth.route");
+const userRoutes = require("./src/routes/user.route");
 
 // Middleware
 app.use(express.json());
@@ -19,6 +20,8 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 // Protected Route 
 app.use("api/auth/me", authRoutes);
+// User Route
+app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
