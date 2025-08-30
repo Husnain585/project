@@ -5,7 +5,6 @@ const { v4: uuid } = require("uuid");
 
 class User extends Model {
   toJSON() {
-    // Hide sensitive fields when returning data
     const values = { ...this.get() };
     delete values.password;
     return values;
@@ -47,9 +46,5 @@ User.init(
   }
 );
 
-// Hooks
-User.beforeCreate(async (user) => {
-  user.password = await hash(user.password, 10);
-});
 
 module.exports = User;
