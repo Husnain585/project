@@ -63,16 +63,20 @@ Product.hasMany(ProductImage, { foreignKey: "productId", as: "images" });
 ProductImage.belongsTo(Product, { foreignKey: "productId", as: "product" });
 
 // Users ↔ Wishlist ↔ Products (many-to-many)
-User.belongsToMany(Product, {
-  through: Wishlist,
-  foreignKey: "userId",
-  as: "wishlistProducts",
-});
-Product.belongsToMany(User, {
-  through: Wishlist,
-  foreignKey: "productId",
-  as: "wishlistedBy",
-});
+// User.belongsToMany(Product, {
+//   through: Wishlist,
+//   foreignKey: "userId",
+//   as: "wishlistProducts",
+// });
+// Product.belongsToMany(User, {
+//   through: Wishlist,
+//   foreignKey: "productId",
+//   as: "wishlistedBy",
+// });
+User.belongsToMany(Product, { through: Wishlist, foreignKey: "userId" });
+Product.belongsToMany(User, { through: Wishlist, foreignKey: "productId" });
+Wishlist.belongsTo(Product, { foreignKey: "productId" });
+Product.hasMany(Wishlist, { foreignKey: "productId" });
 
 // Users ↔ Reviews ↔ Products (one-to-many both sides)
 User.hasMany(Review, { foreignKey: "userId", as: "reviews" });
