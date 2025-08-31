@@ -109,16 +109,18 @@ module.exports = {
 
       const order = await Order.findOne({
         where: { orderId: orderId, userId },
-        include: [ {
-      model: OrderItem,
-      as: "items", 
-      include: [
-        {
-          model: Product,
-          as: "product", 
-        },
-      ],
-    },],
+        include: [
+          {
+            model: OrderItem,
+            as: "items",
+            include: [
+              {
+                model: Product,
+                as: "product",
+              },
+            ],
+          },
+        ],
       });
 
       if (!order) {
@@ -136,16 +138,35 @@ module.exports = {
 
   // Admin: Get all orders
   getAllOrders: async (req, res) => {
-    try {
-      const orders = await Order.findAll({
-        include: [{ model: OrderItem, include: [Product] }],
-      });
-      return res.status(200).json({ orders });
-    } catch (error) {
-      console.error("Get All Orders Error:", error);
-      return res.status(500).json({ error: "Server error" });
-    }
-  },
+  try {
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: OrderItem,
+          as: "items", // must match your association alias
+          include: [
+            {
+              model: Product,
+              as: "product", // must match the alias in OrderItem → Product association
+            },
+          ],
+        },
+        {
+          model: Payment,
+          as: "payment", // include payment info if needed
+        },
+      ],
+    });
+
+    return res.status(200).json({ orders });
+  } catch (error) {
+    console.error("Get All Orders Error:", error);
+    return res
+      .status(500)
+      .json({ error: "Server error", details: error.message });
+  }
+},
+
 
   // Admin: Update order status
   updateOrderStatus: async (req, res) => {
@@ -164,7 +185,7 @@ module.exports = {
       return res.status(200).json({ message: "Order status updated", order });
     } catch (error) {
       console.error("Update Order Status Error:", error);
-      return res.status(500).json({ error: "Server error" });
+      return res.status(500).json({ error: "Server error", details: error.message });
     }
   },
 
@@ -174,7 +195,9 @@ module.exports = {
       const { orderId } = req.params;
       const userId = req.user.userId;
 
-      const order = await Order.findOne({ where: { id: orderId, userId } });
+      const order = await Order.findOne({
+        where: { orderId, userId },
+      });
       if (!order) {
         return res.status(404).json({ error: "Order not found" });
       }
@@ -191,7 +214,9 @@ module.exports = {
       return res.status(200).json({ message: "Order cancelled", order });
     } catch (error) {
       console.error("Cancel Order Error:", error);
-      return res.status(500).json({ error: "Server error" });
+      return res
+        .status(500)
+        .json({ error: "Server error", details: error.message });
     }
   },
 };
