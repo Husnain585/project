@@ -5,12 +5,13 @@ const {
   getProductImages,
   deleteProductImage,
 } = require("../controller/productImage.controller");
+const { adminCheck } = require("../middleware/adminCheck.middleware");
 
 // Public route: Get all images of a product
 router.get("/:productId", getProductImages);
 
 // Protected routes (admin only)
-router.post("/", authMiddleware, createProductImage);
+router.post("/", authMiddleware,  createProductImage);
 router.delete("/:imageId", authMiddleware, deleteProductImage);
 
 module.exports = router;

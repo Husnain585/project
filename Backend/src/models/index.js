@@ -17,22 +17,21 @@ const CartItem = require("./cartItem");
 
 // Attach models
 const models = {
-  Cart: new Cart(sequelize),
-  CartItem : new CartItem(sequelize),
-  Admin: new Admin(sequelize),
-  User: new User(sequelize),
-  Category: new Category(sequelize),
-  Payment: new Payment(sequelize),
-  Order: new Order(sequelize),
-  Product: new Product(sequelize),
-  OrderItem: new OrderItem(sequelize),
-  ProductImage: new ProductImage(sequelize),
-  Review: new Review(sequelize),
-  Wishlist: new Wishlist(sequelize),
-  Address: new Address(sequelize),
+  Cart,
+  Admin,
+  User,
+  Category,
+  Order,
+  Product,
+  OrderItem,
+  ProductImage,
+  Review,
+  Wishlist,
+  Address,
+  Payment,
+  CartItem,
 };
-  
-// ===== Relations =====
+  // ===== Relations =====
 
 // Users ↔ Cart (one-to-many)
 User.hasMany(Cart, { foreignKey: "userId", as: "carts" });
@@ -63,16 +62,6 @@ Product.hasMany(ProductImage, { foreignKey: "productId", as: "images" });
 ProductImage.belongsTo(Product, { foreignKey: "productId", as: "product" });
 
 // Users ↔ Wishlist ↔ Products (many-to-many)
-// User.belongsToMany(Product, {
-//   through: Wishlist,
-//   foreignKey: "userId",
-//   as: "wishlistProducts",
-// });
-// Product.belongsToMany(User, {
-//   through: Wishlist,
-//   foreignKey: "productId",
-//   as: "wishlistedBy",
-// });
 User.belongsToMany(Product, { through: Wishlist, foreignKey: "userId" });
 Product.belongsToMany(User, { through: Wishlist, foreignKey: "productId" });
 Wishlist.belongsTo(Product, { foreignKey: "productId" });
@@ -95,6 +84,7 @@ CartItem.belongsTo(Cart, { foreignKey: "cartId" });
 
 Product.hasMany(CartItem, { foreignKey: "productId" });
 CartItem.belongsTo(Product, { foreignKey: "productId" });
+
 
 // Build db object
 const db = {};

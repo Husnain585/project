@@ -1,6 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
 const { v4: uuid } = require("uuid");
+const User = require("./users");
 
 class Order extends Model {}
 
@@ -14,13 +15,20 @@ Order.init(
     userId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: { model: "users", key: "userId" },
+      references: { model: User, key: "userId" },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
     status: {
-      type: DataTypes.ENUM("pending","paid","shipped","completed","cancelled"),
+      type: DataTypes.ENUM("pending", "paid", "shipped", "delivered", "cancelled"),
       defaultValue: "pending",
     },
-    totalAmount: { type: DataTypes.DECIMAL(10,2), allowNull: false },
+    totalAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0.0,
+    },
+    
   },
   {
     sequelize: connection,
@@ -29,8 +37,5 @@ Order.init(
     timestamps: true,
   }
 );
-Order.beforeCreate(async (cart) => {
-  Order.orderId = uuid();  
-});
 
 module.exports = Order;

@@ -7,6 +7,7 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../controller/product.controller");
+const { adminCheck } = require("../middleware/adminCheck.middleware");
 
 // Public routes
 router.get("/", getAllProducts);

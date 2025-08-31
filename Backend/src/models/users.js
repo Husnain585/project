@@ -1,42 +1,53 @@
-// models/users.js
 const { DataTypes, Model } = require("sequelize");
-const sequelize = require("../config/db.connection"); 
+const connection = require("../config/db.connection");
+const { v4: uuid } = require("uuid");
 
-const User = sequelize.define("User", {
-  userId: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true, // enforce unique username
-    validate: {
-      notEmpty: true,
+class User extends Model {
+  toJSON() {
+    const values = { ...this.get() };
+    delete values.password;
+    return values;
+  }
+}
+
+User.init(
+  {
+    userId: {
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    name: {
+      type: DataTypes.STRING(60),
+      allowNull: false,
+    },
+    username: {
+      type: DataTypes.STRING(60),
+      unique: true,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING(1000),
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(60),
+      allowNull: false,
+      validate: { isEmail: true },
+    },
+    role: {
+      type: DataTypes.ENUM("customer", "admin"),
+      allowNull: false,
+      defaultValue: "customer", // every user is customer unless explicitly set
     },
   },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true, // enforce unique email
-    validate: {
-      isEmail: true, // ensures proper email format
-      notEmpty: true,
-    },
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  paranoid: true, // enables soft delete (since you used paranoid: false in queries)
-  timestamps: true,
-  tableName: "users",
-});
+  {
+    sequelize: connection,
+    modelName: "User",
+    tableName: "users",
+    timestamps: true,
+    paranoid: true,
+  }
+);
 
 module.exports = User;

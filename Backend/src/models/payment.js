@@ -1,6 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
 const { v4: uuid } = require("uuid");
+const Order = require("./order");
 
 class Payment extends Model {}
 
@@ -14,11 +15,22 @@ Payment.init(
     orderId: {
       type: DataTypes.UUID,
       allowNull: false,
-      references: { model: "orders", key: "orderId" },
+      references: { model: Order, key: "orderId" },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
-    method: { type: DataTypes.ENUM("credit_card","paypal","stripe"), allowNull: false },
-    amount: { type: DataTypes.DECIMAL(10,2), allowNull: false },
-    status: { type: DataTypes.ENUM("pending","successful","failed"), defaultValue: "pending" },
+    amount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    method: {
+      type: DataTypes.ENUM("card", "paypal", "cod"),
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("pending", "completed", "failed"),
+      defaultValue: "pending",
+    },
   },
   {
     sequelize: connection,

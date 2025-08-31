@@ -15,6 +15,7 @@ const productRoutes = require("./src/routes/product.route");
 const categoryRoutes = require("./src/routes/category.route");
 const productImageRoutes = require("./src/routes/productImage.route");
 const wishlist = require("./src/routes/wishlist.route");
+const orderRoutes = require("./src/routes/order.route");
 
 // Middleware
 app.use(express.json());
@@ -37,6 +38,8 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/product-image", productImageRoutes);
 // wishlist Route
 app.use("/api/wishlist", wishlist);
+// Order Route
+app.use("/api/order", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

@@ -39,11 +39,11 @@ module.exports = {
 
       // Minimal JWT payload
       const payload = { userId: user.userId, username: user.username };
-      const token = sign(payload, process.env.SECRET, { expiresIn: "5m" });
+      const token = sign(payload, process.env.SECRET, { expiresIn: "15m" });
 
       // Set secure cookie
       res.cookie("auth", token, {
-        maxAge: 5 * 60 * 1000, // 5 minutes
+        maxAge: 15 * 60 * 1000, // 15 minutes
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
@@ -53,7 +53,7 @@ module.exports = {
       return res.status(200).json({ message: "Login successful", token });
     } catch (error) {
       console.error("Login Error:", error);
-      return res.status(500).json({ error: "Server error" });
+      return res.status(500).json({ error: "Server error", details: error.message });
     }
   },
   Logout: async (req, res) => {

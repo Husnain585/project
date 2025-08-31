@@ -9,9 +9,9 @@ class Cart extends Model {}
 Cart.init(
   {
     cartId: {
-      primaryKey: true,
       type: DataTypes.UUID,
-      defaultValue: uuid,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
     },
     userId: {
       type: DataTypes.UUID,
