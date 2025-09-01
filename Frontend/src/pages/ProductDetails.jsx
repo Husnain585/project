@@ -36,7 +36,6 @@ const ProductDetails = () => {
         const res = await axios.get(
           `${config.apiBaseUrl}/product-image/${productId}`
         );
-        console.log(res.data)
         setImages(res.data.images || []);
       } catch (err) {
         console.error("Failed to fetch product images", err);
@@ -79,7 +78,7 @@ const ProductDetails = () => {
               <motion.img
                 key={idx}
                 src={img.imageUrl}
-                alt={img.altText || product.name}
+                alt={img.imageId || product.name}
                 className="w-full h-64 object-cover rounded-lg"
                 whileHover={{ scale: 1.05 }}
               />
@@ -97,12 +96,13 @@ const ProductDetails = () => {
         <div className="md:w-1/2 flex flex-col justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+            
             <p className="text-xl text-blue-600 font-semibold mb-4">
               ${product.price ?? "N/A"}
             </p>
             <p className="mb-4">{product.description || "No description."}</p>
             <p className="text-sm text-gray-500 mb-6">
-              Category: {product.category?.name || "N/A"}
+              Category: <em> {product.categoryId || "N/A"} </em>
             </p>
             <p className="text-sm text-gray-400">
               Product ID: <strong>{productId}</strong>
