@@ -10,12 +10,16 @@ import Wishlist from "../pages/Wishlist";
 import Cart from "../pages/Cart";
 import ProductDetails from "../pages/ProductDetails";
 import ProtectedRoute from "../routes/ProtectedRoute";
+import CategoryProducts from "../components/categoryProduct/CategoryProducts";
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Home />} />
     <Route path="/products" element={<Products />} />
     <Route path="/categories" element={<Categories />} />
+    {/* ✅ Dynamic route for category products */}
+    <Route path="/category/:categoryId" element={<CategoryProducts />} />
+
     <Route path="/about" element={<About />} />
     <Route
       path="/wishlist"
@@ -28,9 +32,7 @@ const AppRoutes = () => (
     <Route
       path="/cart"
       element={
-        <ProtectedRoute>
           <Cart />
-        </ProtectedRoute>
       }
     />
     <Route path="/login" element={<Login />} />

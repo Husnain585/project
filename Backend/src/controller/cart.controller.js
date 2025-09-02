@@ -80,7 +80,7 @@ const addToCart = async (req, res) => {
     });
   } catch (error) {
     console.error("Add To Cart Error:", error);
-    return res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Server error" ,details: error.message});
   }
 };
 

@@ -1,3 +1,4 @@
+// src/hooks/useProducts.js
 import { useEffect, useState } from "react";
 import axios from "axios";
 import config from "../config/config";
@@ -31,9 +32,7 @@ const useProducts = () => {
   // Get product by ID from local array
   const getProductById = (id) => {
     if (!id) return null;
-    return products.find(
-      (p) => String(p.id ?? p.productId) === String(id)
-    ) || null;
+    return products.find((p) => String(p.id ?? p.productId) === String(id)) || null;
   };
 
   // Fetch product by ID directly from API

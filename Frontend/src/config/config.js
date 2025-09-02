@@ -3,7 +3,6 @@ const config = {
   apiBaseUrl: "http://localhost:3000/api", // backend base url
   currency: "USD", // or PKR, INR, etc.
   defaultLanguage: "en",
-
   // UI settings
   theme: {
     primaryColor: "#1D4ED8", // Tailwind's blue-700

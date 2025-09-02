@@ -1,91 +1,65 @@
-import React, { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../context/GlobalContext";
-import axiosInstance from "../utils/axiosInstance";
-import { motion, AnimatePresence } from "framer-motion";
+// src/pages/Cart.jsx
+import React from "react";
+import useCart from "../hooks/UseCart";
 
-const Cart = () => {
-  const { cartCount, setCartCount } = useContext(GlobalContext);
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+function Cart() {
+  const { cart, loading, removeFromCart, calculateTotal } = useCart();
 
-  // Fetch cart items from backend
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      const res = await axiosInstance.get("/cart");
-      setCartItems(res.data.items || []);
-      setCartCount(res.data.items?.length || 0);
-    } catch (err) {
-      console.error("Error fetching cart:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const removeFromCart = async (itemId) => {
-    try {
-      await axiosInstance.delete(`/cart/${itemId}`);
-      setCartItems(cartItems.filter((item) => item.id !== itemId));
-      setCartCount((prev) => Math.max(0, prev - 1));
-    } catch (err) {
-      console.error("Error removing item:", err);
-    }
-  };
-
-  const calculateTotal = () =>
-    cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  if (loading) {
+    return (
+      <div className="container mt-10">
+        <p>Loading your cart...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">🛒 Your Cart</h1>
-      {loading ? (
-        <p>Loading cart...</p>
-      ) : cartItems.length === 0 ? (
-        <p>Your cart is empty</p>
+    <div className="container mt-10">
+      <h1 className="text-2xl font-bold mb-5">Your Cart</h1>
+
+      {cart.length === 0 ? (
+        <p className="text-gray-500">Your cart is empty.</p>
       ) : (
-        <div className="space-y-4">
-          <AnimatePresence>
-            {cartItems.map((item) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                className="flex items-center justify-between p-4 border rounded-lg shadow-sm"
+        <div>
+          <ul className="space-y-4">
+            {cart.map((item) => (
+              <li
+                key={item.productId}
+                className="flex justify-between items-center border-b pb-3"
               >
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={item.product.images?.[0]?.url || ""}
-                    alt={item.product.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <div>
-                    <h2 className="font-semibold">{item.product.name}</h2>
-                    <p>${item.product.price.toFixed(2)}</p>
-                    <p>Qty: {item.quantity}</p>
-                  </div>
+                <div>
+                  <h2 className="text-lg font-semibold">
+                    {item.product?.name || "Unnamed Product"}
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Price: ${item.product?.price ?? 0}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Quantity: {item.quantity}
+                  </p>
+                  <p className="text-sm font-medium">
+                    Subtotal: ${(Number(item.product?.price) || 0) * item.quantity}
+                  </p>
                 </div>
                 <button
-                  onClick={() => removeFromCart(item.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                  onClick={() => removeFromCart(item.productId)}
+                  className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
                 >
                   Remove
                 </button>
-              </motion.div>
+              </li>
             ))}
-          </AnimatePresence>
+          </ul>
 
-          <div className="mt-6 flex justify-end text-xl font-bold">
-            Total: ${calculateTotal().toFixed(2)}
+          <div className="mt-6 text-right">
+            <h2 className="text-xl font-bold">
+              Total: ${calculateTotal().toFixed(2)}
+            </h2>
           </div>
         </div>
       )}
     </div>
   );
-};
+}
 
 export default Cart;

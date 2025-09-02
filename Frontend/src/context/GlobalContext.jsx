@@ -9,13 +9,33 @@ export const GlobalProvider = ({ children }) => {
   const [token, setToken] = useState(
     localStorage.getItem(config.storageKeys.authToken) || null
   );
+
+  const [cart, setCart] = useState([]); // <-- add cart array
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
-  const [loadingUser, setLoadingUser] = useState(true); // prevent flicker
+  const [loadingUser, setLoadingUser] = useState(true);
 
   // Actions
-  const addToCart = () => setCartCount((c) => c + 1);
-  const removeFromCart = () => setCartCount((c) => Math.max(0, c - 1));
+  const addToCart = (product) => {
+    setCart((prev) => {
+      const existing = prev.find((p) => p.id === product.id);
+      if (existing) {
+        return prev.map((p) =>
+          p.id === product.id
+            ? { ...p, quantity: p.quantity + 1 }
+            : p
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+    setCartCount((c) => c + 1);
+  };
+
+  const removeFromCart = (productId) => {
+    setCart((prev) => prev.filter((p) => p.id !== productId));
+    setCartCount((c) => Math.max(0, c - 1));
+  };
+
   const toggleWishlist = (isAdding = true) =>
     setWishlistCount((c) => Math.max(0, c + (isAdding ? 1 : -1)));
 
@@ -35,13 +55,12 @@ export const GlobalProvider = ({ children }) => {
       }
       try {
         setLoadingUser(true);
-        const res = await axiosInstance.get("/user/me"); // or `/user/me`
+        const res = await axiosInstance.get("/user/me");
         setUser(res.data.user || res.data);
-        // console.log(res.data);
       } catch (err) {
         console.error("Failed to fetch user:", err);
         setUser(null);
-        setToken(null); // clear invalid token
+        setToken(null);
       } finally {
         setLoadingUser(false);
       }
@@ -56,6 +75,8 @@ export const GlobalProvider = ({ children }) => {
         setUser,
         token,
         setToken,
+        cart,
+        setCart,
         cartCount,
         setCartCount,
         wishlistCount,
@@ -70,3 +91,4 @@ export const GlobalProvider = ({ children }) => {
     </GlobalContext.Provider>
   );
 };
+

@@ -1,33 +1,33 @@
-import React, { useContext, useEffect, useState } from "react";
+// src/pages/ProductDetails.jsx
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { GlobalContext } from "../context/GlobalContext";
 import useProducts from "../hooks/useProducts";
+import useCart from "../hooks/UseCart";
 import axios from "axios";
 import config from "../config/config";
 
 const ProductDetails = () => {
-  const { productId } = useParams(); // from route
-  const { addToCart } = useContext(GlobalContext);
+  const { productId } = useParams();
   const { loading, getProductById, getProductByIdFromApi } = useProducts();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [images, setImages] = useState([]);
   const [loadingImages, setLoadingImages] = useState(true);
+  const [adding, setAdding] = useState(false);
 
-  // Fetch product from local state or API if not found
+  // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       let p = getProductById(productId);
-      if (!p) {
-        p = await getProductByIdFromApi(productId);
-      }
+      if (!p) p = await getProductByIdFromApi(productId);
       setProduct(p || null);
     };
     fetchProduct();
   }, [productId, getProductById, getProductByIdFromApi]);
 
-  // Fetch product images separately
+  // Fetch product images
   useEffect(() => {
     const fetchImages = async () => {
       if (!productId) return;
@@ -51,14 +51,17 @@ const ProductDetails = () => {
     return <p className="text-center mt-10">Loading product...</p>;
   }
 
-  const handleAddToCart = () => {
-    addToCart({
-      id: product.id || product.productId,
-      name: product.name,
-      price: product.price,
-      image: images?.[0]?.imageUrl || "",
-      quantity: 1,
-    });
+  // Add to cart handler
+  const handleAddToCart = async () => {
+    setAdding(true);
+    try {
+      await addToCart(product.id || product.productId, 1); // ✅ Only send ID and quantity
+      console.log("Added to cart:", product.id || product.productId);
+    } catch (err) {
+      console.error("Failed to add to cart", err);
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (
@@ -96,13 +99,12 @@ const ProductDetails = () => {
         <div className="md:w-1/2 flex flex-col justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-            
             <p className="text-xl text-blue-600 font-semibold mb-4">
               ${product.price ?? "N/A"}
             </p>
             <p className="mb-4">{product.description || "No description."}</p>
             <p className="text-sm text-gray-500 mb-6">
-              Category: <em> {product.categoryId || "N/A"} </em>
+              Category: <em>{product.categoryId || "N/A"}</em>
             </p>
             <p className="text-sm text-gray-400">
               Product ID: <strong>{productId}</strong>
@@ -112,9 +114,12 @@ const ProductDetails = () => {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleAddToCart}
-            className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
+            disabled={adding}
+            className={`bg-blue-600 text-white py-3 rounded-lg transition font-semibold hover:bg-blue-700 ${
+              adding ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Add to Cart
+            {adding ? "Adding..." : "Add to Cart"}
           </motion.button>
         </div>
       </div>
