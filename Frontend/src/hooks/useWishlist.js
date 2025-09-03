@@ -1,20 +1,31 @@
-import { useContext } from "react";
+// src/hooks/useWishlist.js
+import { useContext, useMemo } from "react";
 import { GlobalContext } from "../context/GlobalContext";
 
 const useWishlist = () => {
-  const { wishlist, wishlistCount, addToWishlist, removeFromWishlist } =
-    useContext(GlobalContext);
+  const ctx = useContext(GlobalContext);
+  if (!ctx) throw new Error("useWishlist must be used inside <GlobalProvider>");
 
-  // Optional helper to toggle a product in the wishlist
-  const toggleWishlist = (product) => {
-    if (wishlist.some((p) => p.id === (product.id || product.productId))) {
-      removeFromWishlist(product.id || product.productId);
-    } else {
-      addToWishlist(product);
-    }
+  const {
+    wishlist,
+    wishlistCount,
+    addToWishlist,
+    removeFromWishlist,
+    toggleWishlist,
+    isInWishlist,
+  } = ctx;
+
+  // Stable checker if you want to pass around a function
+  const has = useMemo(() => (productId) => isInWishlist(productId), [isInWishlist]);
+
+  return {
+    wishlist,
+    wishlistCount,
+    addToWishlist,
+    removeFromWishlist,
+    toggleWishlist,
+    isInWishlist: has,
   };
-
-  return { wishlist, wishlistCount, addToWishlist, removeFromWishlist, toggleWishlist };
 };
 
 export default useWishlist;

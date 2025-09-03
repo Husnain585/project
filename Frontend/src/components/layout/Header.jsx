@@ -47,18 +47,28 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           {!token ? (
             <>
-              <Link to="/login" className="text-sm font-medium hover:text-blue-600">
+              <Link
+                to="/login"
+                className="text-sm font-medium hover:text-blue-600"
+              >
                 Login
               </Link>
-              <Link to="/register" className="text-sm font-medium hover:text-blue-600">
+              <Link
+                to="/register"
+                className="text-sm font-medium hover:text-blue-600"
+              >
                 Register
               </Link>
             </>
           ) : (
             <>
-              <span className="text-sm font-medium text-gray-700">
+              <Link
+                to="/profile"
+                className="text-sm font-medium text-gray-700 hover:text-blue-600"
+              >
                 Hi, {user?.username || "User"}
-              </span>
+              </Link>
+
               <button
                 onClick={handleLogout}
                 className="text-sm text-red-500 hover:underline"

@@ -11,6 +11,7 @@ import Cart from "../pages/Cart";
 import ProductDetails from "../pages/ProductDetails";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import CategoryProducts from "../components/categoryProduct/CategoryProducts";
+import Profile from "../pages/Profile";
 
 const AppRoutes = () => (
   <Routes>
@@ -36,6 +37,7 @@ const AppRoutes = () => (
       }
     />
     <Route path="/login" element={<Login />} />
+    <Route path="/profile" element={<Profile />} />
     <Route path="/register" element={<Register />} />
     <Route path="/product/:productId" element={<ProductDetails />} />
   </Routes>
