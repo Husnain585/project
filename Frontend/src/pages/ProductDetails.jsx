@@ -25,7 +25,6 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       if (!productId) return;
       let p = productsHook.getProductById(productId);
-      if (!p) p = await productsHook.getProductByIdFromApi(productId);
       setProduct(p || null);
     };
     fetchProduct();

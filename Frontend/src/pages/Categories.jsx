@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -11,6 +11,7 @@ const Categories = () => {
     const fetchCategories = async () => {
       try {
         const res = await axiosInstance.get("/category");
+        // ✅ supports both `{ categories: [...] }` and `[ ... ]`
         setCategories(res.data.categories || res.data);
       } catch (err) {
         console.error("Error fetching categories:", err);
@@ -21,9 +22,13 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading categories...</p>;
-  if (categories.length === 0)
-    return <p className="text-center mt-10">No categories found</p>;
+  if (loading) {
+    return <p className="text-center mt-10">Loading categories...</p>;
+  }
+
+  if (!categories || categories.length === 0) {
+    return <p className="text-center mt-10 text-gray-500">No categories found.</p>;
+  }
 
   return (
     <motion.div
@@ -32,19 +37,37 @@ const Categories = () => {
       transition={{ duration: 0.5 }}
       className="container mx-auto px-4 py-10"
     >
-      <h1 className="text-3xl font-bold mb-8 text-center">Categories</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {categories.map((category, index) => (
+      <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white">
+        Shop by Category
+      </h1>
+
+      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {categories.map((cat, index) => (
           <motion.div
-            key={category.categoryId || index}
+            key={cat.categoryId || index}
             whileHover={{ scale: 1.05 }}
-            className="bg-white shadow rounded-lg p-6 text-center cursor-pointer"
+            className="bg-white rounded-2xl shadow hover:shadow-lg overflow-hidden border border-gray-100"
           >
-            <Link
-              to={`/category/${category.categoryId}`}
-              className="text-lg font-semibold hover:text-blue-600"
-            >
-              {category.name}
+            <Link to={`/category/${cat.categoryId}`} className="block">
+              <div className="relative">
+                <img
+                  src={
+                    cat.imageUrl ||
+                    `https://picsum.photos/seed/${cat.categoryId}/400/300`
+                  }
+                  alt={cat.name}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                  <span className="text-white font-semibold text-lg">
+                    View Products
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 text-center">
+                <h2 className="text-lg font-bold text-gray-800">{cat.name}</h2>
+              </div>
             </Link>
           </motion.div>
         ))}

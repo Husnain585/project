@@ -1,32 +1,17 @@
 // src/pages/Checkout.jsx
-import React, { useState } from "react";
-import useCart from "../hooks/useCart";
+import React from "react";
+import useCheckout from "../hooks/useCheckout";
 
 const Checkout = () => {
-  const { cart, calculateTotal, clearCart } = useCart();
-  const [shipping, setShipping] = useState({
-    fullName: "",
-    email: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    country: "",
-  });
-
-  const [success, setSuccess] = useState(false);
-
-  const handleChange = (e) => {
-    setShipping({ ...shipping, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Placeholder for payment integration
-    console.log("Order submitted:", { shipping, cart });
-    setSuccess(true);
-    clearCart();
-  };
+  const {
+    cart,
+    shipping,
+    success,
+    loading,
+    calculateTotal,
+    handleChange,
+    handleSubmit,
+  } = useCheckout();
 
   if (cart.length === 0 && !success) {
     return (
@@ -53,93 +38,30 @@ const Checkout = () => {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Shipping Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block font-medium mb-1">Full Name</label>
-            <input
-              type="text"
-              name="fullName"
-              value={shipping.fullName}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block font-medium mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={shipping.email}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block font-medium mb-1">Address</label>
-            <input
-              type="text"
-              name="address"
-              value={shipping.address}
-              onChange={handleChange}
-              required
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium mb-1">City</label>
+          {["fullName", "email", "address", "city", "state", "zip", "country"].map((field) => (
+            <div key={field}>
+              <label className="block font-medium mb-1 capitalize">
+                {field}
+              </label>
               <input
-                type="text"
-                name="city"
-                value={shipping.city}
+                type={field === "email" ? "email" : "text"}
+                name={field}
+                value={shipping[field]}
                 onChange={handleChange}
                 required
                 className="w-full border rounded px-3 py-2"
               />
             </div>
-            <div>
-              <label className="block font-medium mb-1">State</label>
-              <input
-                type="text"
-                name="state"
-                value={shipping.state}
-                onChange={handleChange}
-                required
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium mb-1">ZIP</label>
-              <input
-                type="text"
-                name="zip"
-                value={shipping.zip}
-                onChange={handleChange}
-                required
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">Country</label>
-              <input
-                type="text"
-                name="country"
-                value={shipping.country}
-                onChange={handleChange}
-                required
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-          </div>
+          ))}
 
           <button
             type="submit"
-            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            disabled={loading}
+            className={`mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Place Order
+            {loading ? "Processing..." : "Place Order"}
           </button>
         </form>
 

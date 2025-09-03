@@ -22,21 +22,11 @@ const useProducts = () => {
     return products.find((p) => p.id === id || p.productId === id) || null;
   };
 
-  const getProductByIdFromApi = async (id) => {
-    try {
-      const res = await axios.get(`${config.apiBaseUrl}/products/${id}`);
-      return res.data || null;
-    } catch (err) {
-      console.error("Failed to fetch product by ID", err);
-      return null;
-    }
-  };
-
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  return { products, loading, getProductById, getProductByIdFromApi };
+  return { products, loading, getProductById };
 };
 
 export default useProducts;
