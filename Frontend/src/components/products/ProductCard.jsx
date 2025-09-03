@@ -1,6 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faCartPlus, faStar, faStarHalfStroke } from "@fortawesome/free-solid-svg-icons";
+import {
+  faHeart,
+  faCartPlus,
+  faStar,
+  faStarHalfStroke,
+} from "@fortawesome/free-solid-svg-icons";
 import { GlobalContext } from "../../context/GlobalContext";
 import { formatCurrency } from "../../utils/format";
 
@@ -15,23 +20,22 @@ const Stars = ({ rating = 0 }) => {
       ))}
       {half && <FontAwesomeIcon icon={faStarHalfStroke} className="text-yellow-500" />}
       {Array.from({ length: blanks }).map((_, i) => (
-        <span key={`b${i}`} className="w-3 h-3 rounded-sm bg-gray-200 inline-block" />
+        <span
+          key={`b${i}`}
+          className="w-3 h-3 rounded-sm bg-gray-200 inline-block"
+        />
       ))}
     </div>
   );
 };
 
 const ProductCard = ({ product }) => {
-  const { addToCart, toggleWishlist } = useContext(GlobalContext);
-  const [liked, setLiked] = useState(false);
+  const { addToCart, addToWishlist, wishlist } = useContext(GlobalContext);
 
   const image =
     product?.images?.[0]?.imageUrl || "https://picsum.photos/seed/fallback/600/600";
 
-  const onWishlist = () => {
-    setLiked((prev) => !prev);
-    toggleWishlist(!liked);
-  };
+  const isInWishlist = wishlist.some((item) => item.id === product.id);
 
   return (
     <div className="group bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden border border-gray-100">
@@ -39,12 +43,15 @@ const ProductCard = ({ product }) => {
         <img src={image} alt={product.name} className="w-full h-56 object-cover" />
         <button
           aria-label="wishlist"
-          onClick={onWishlist}
-          className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-2 rounded-full shadow hover:scale-105 transition"
+          onClick={() => !isInWishlist && addToWishlist(product)}
+          className={`absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-2 rounded-full shadow hover:scale-105 transition ${
+            isInWishlist ? "cursor-not-allowed" : ""
+          }`}
+          disabled={isInWishlist}
         >
           <FontAwesomeIcon
             icon={faHeart}
-            className={liked ? "text-red-500" : "text-gray-700"}
+            className={isInWishlist ? "text-red-500" : "text-gray-700"}
           />
         </button>
       </div>
@@ -61,7 +68,7 @@ const ProductCard = ({ product }) => {
         </div>
 
         <button
-          onClick={addToCart}
+          onClick={() => addToCart(product, 1)}
           className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition"
         >
           <FontAwesomeIcon icon={faCartPlus} />

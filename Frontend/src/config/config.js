@@ -1,7 +1,7 @@
 const config = {
   appName: "My E-Commerce",
   apiBaseUrl: "http://localhost:3000/api", // backend base url
-  currency: "USD", // or PKR, INR, etc.
+  currency: "PKR", // or PKR, INR, etc.
   defaultLanguage: "en",
   // UI settings
   theme: {

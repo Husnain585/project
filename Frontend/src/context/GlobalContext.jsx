@@ -1,5 +1,5 @@
 // src/context/GlobalContext.js
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useContext } from "react";
 import config from "../config/config";
 import axiosInstance from "../utils/axiosInstance";
 
@@ -100,13 +100,30 @@ export const GlobalProvider = ({ children }) => {
   const calculateTotal = () => {
     return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   };
+  const updateQuantity = (productId, quantity) => {
+    setCart((prev) => {
+      const updated = prev.map((item) =>
+        item.productId === productId ? { ...item, quantity } : item
+      );
+      setCartCount(updated.reduce((acc, item) => acc + item.quantity, 0));
+      localStorage.setItem(config.storageKeys.cart, JSON.stringify(updated));
+      return updated;
+    });
+  };
   // ---------------------------------------------------
   // 📌 WISHLIST
   // ---------------------------------------------------
   const addToWishlist = (product) => {
     setWishlist((prev) => {
-      if (prev.some((p) => p.id === product.id)) return prev;
-      const updated = [...prev, product];
+      const normalizedProduct = {
+        ...product,
+        id: product.id || product.productId,
+      };
+      console.log(normalizedProduct);
+      if (prev.some((p) => p.id === normalizedProduct.id)) return prev;
+      console.log(prev);
+
+      const updated = [...prev, normalizedProduct];
       setWishlistCount(updated.length);
       localStorage.setItem(
         config.storageKeys.wishlist,
@@ -118,7 +135,7 @@ export const GlobalProvider = ({ children }) => {
 
   const removeFromWishlist = (productId) => {
     setWishlist((prev) => {
-      const updated = prev.filter((p) => p.id !== productId);
+      const updated = prev.filter((p) => (p.id || p.productId) !== productId);
       setWishlistCount(updated.length);
       localStorage.setItem(
         config.storageKeys.wishlist,
@@ -183,6 +200,7 @@ export const GlobalProvider = ({ children }) => {
         removeFromCart,
         clearCart,
         calculateTotal,
+        updateQuantity,
 
         // Wishlist
         wishlist,
@@ -195,3 +213,5 @@ export const GlobalProvider = ({ children }) => {
     </GlobalContext.Provider>
   );
 };
+
+export const useGlobalContext = () => useContext(GlobalContext);

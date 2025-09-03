@@ -1,50 +1,92 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import useProducts from "../hooks/useProducts";
-import useCart from "../hooks/useCart";
+// src/pages/Products.jsx
+import React, { useState, useEffect } from "react";
+import ProductGrid from "../components/products/ProductGrid";
+import { useGlobalContext } from "../context/GlobalContext";
 
-function Products() {
-  const { products, loading } = useProducts();
-  const { addToCart } = useCart();
+const Products = () => {
+  const { products, loadingProducts, categories } = useGlobalContext();
 
-  if (loading) {
-    return <p className="text-center mt-10">Loading products...</p>;
-  }
+  // Local state for search, filter, and sort
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortOrder, setSortOrder] = useState("default");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  useEffect(() => {
+    let result = [...products];
+
+    // Filter by category
+    if (selectedCategory !== "all") {
+      const catId = Number(selectedCategory);
+      result = result.filter(
+        (p) => (p.category ? p.category.id : p.categoryId) === catId
+      );
+    }
+
+    // Search by name
+    if (searchQuery.trim() !== "") {
+      result = result.filter((p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Sort
+    if (sortOrder === "price-asc") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortOrder === "price-desc") {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    setFilteredProducts(result);
+  }, [products, searchQuery, selectedCategory, sortOrder]);
 
   return (
-    <div className="container mx-auto py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-      {products.map((product) => (
-        <motion.div
-          key={product.id || product.productId}
-          whileHover={{ scale: 1.02 }}
-          className="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col"
-        >
-          <Link to={`/product/${product.id || product.productId}`}>
-            <img
-              src={product.imageUrl || "https://via.placeholder.com/300x200"}
-              alt={product.name}
-              className="w-full h-48 object-cover"
-            />
-          </Link>
+    <div className="min-h-screen container mx-auto px-4 py-10">
+      <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center text-gray-800 dark:text-white">
+        All Products
+      </h1>
 
-          <div className="p-4 flex flex-col flex-grow">
-            <h2 className="text-lg font-semibold mb-2">{product.name}</h2>
-            <p className="text-blue-600 font-bold mb-4">
-              ${product.price ?? "N/A"}
-            </p>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => addToCart(product.id || product.productId, 1)}
-              className="mt-auto bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              Add to Cart
-            </motion.button>
-          </div>
-        </motion.div>
-      ))}
+      {/* Filters */}
+      <div className="flex flex-wrap gap-4 mb-6 justify-center">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border rounded px-3 py-2 w-64"
+        />
+
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="border rounded px-3 py-2"
+        >
+          <option value="all">All Categories</option>
+          {categories.map((cat, index) => (
+            <option key={cat.id || index} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="border rounded px-3 py-2"
+        >
+          <option value="default">Default</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+        </select>
+      </div>
+
+      {/* Product Grid */}
+      <ProductGrid
+        products={loadingProducts ? [] : filteredProducts}
+        loading={loadingProducts}
+      />
     </div>
   );
-}
+};
 
 export default Products;

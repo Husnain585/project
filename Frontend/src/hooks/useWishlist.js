@@ -2,9 +2,19 @@ import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalContext";
 
 const useWishlist = () => {
-  const { wishlistCount, toggleWishlist } = useContext(GlobalContext);
+  const { wishlist, wishlistCount, addToWishlist, removeFromWishlist } =
+    useContext(GlobalContext);
 
-  return { wishlistCount, toggleWishlist };
+  // Optional helper to toggle a product in the wishlist
+  const toggleWishlist = (product) => {
+    if (wishlist.some((p) => p.id === (product.id || product.productId))) {
+      removeFromWishlist(product.id || product.productId);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
+  return { wishlist, wishlistCount, addToWishlist, removeFromWishlist, toggleWishlist };
 };
 
 export default useWishlist;
