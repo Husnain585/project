@@ -1,15 +1,17 @@
-// src/pages/ProductDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import useProducts from "../hooks/useProducts";
-import useCart from "../hooks/UseCart";
+import useCart from "../hooks/useCart"; // ✅ lowercase
 import axios from "axios";
 import config from "../config/config";
 
 const ProductDetails = () => {
   const { productId } = useParams();
-  const { loading, getProductById, getProductByIdFromApi } = useProducts();
+
+  // ✅ call the hook ONCE, don’t destructure functions directly in case they’re undefined on first render
+  const productsHook = useProducts();
+  console.log("productsHook:", productsHook);
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
@@ -20,12 +22,13 @@ const ProductDetails = () => {
   // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
-      let p = getProductById(productId);
-      if (!p) p = await getProductByIdFromApi(productId);
+      if (!productId) return;
+      let p = productsHook.getProductById(productId);
+      if (!p) p = await productsHook.getProductByIdFromApi(productId);
       setProduct(p || null);
     };
     fetchProduct();
-  }, [productId, getProductById, getProductByIdFromApi]);
+  }, [productId, productsHook]);
 
   // Fetch product images
   useEffect(() => {
@@ -37,8 +40,7 @@ const ProductDetails = () => {
           `${config.apiBaseUrl}/product-image/${productId}`
         );
         setImages(res.data.images || []);
-      } catch (err) {
-        console.error("Failed to fetch product images", err);
+      } catch {
         setImages([]);
       } finally {
         setLoadingImages(false);
@@ -47,7 +49,7 @@ const ProductDetails = () => {
     fetchImages();
   }, [productId]);
 
-  if (loading || !product) {
+  if (productsHook.loading || !product) {
     return <p className="text-center mt-10">Loading product...</p>;
   }
 
@@ -55,7 +57,7 @@ const ProductDetails = () => {
   const handleAddToCart = async () => {
     setAdding(true);
     try {
-      await addToCart(product.id || product.productId, 1); // ✅ Only send ID and quantity
+      await addToCart(product.id || product.productId, 1);
       console.log("Added to cart:", product.id || product.productId);
     } catch (err) {
       console.error("Failed to add to cart", err);

@@ -1,51 +1,40 @@
-// src/hooks/useProducts.js
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import config from "../config/config";
-import mockProducts from "../data/mockProducts";
 
 const useProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  // Fetch all products
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${config.apiBaseUrl}/product`);
-        if (Array.isArray(res.data?.products)) {
-          setProducts(res.data.products);
-        } else {
-          setProducts(mockProducts);
-        }
-      } catch (err) {
-        console.warn("API failed, using mock products", err);
-        setProducts(mockProducts);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-
-  // Get product by ID from local array
-  const getProductById = (id) => {
-    if (!id) return null;
-    return products.find((p) => String(p.id ?? p.productId) === String(id)) || null;
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${config.apiBaseUrl}/product`);
+      setProducts(res.data.products || []);
+    } catch (err) {
+      console.error("Failed to fetch products", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Fetch product by ID directly from API
+  const getProductById = (id) => {
+    return products.find((p) => p.id === id || p.productId === id) || null;
+  };
+
   const getProductByIdFromApi = async (id) => {
-    if (!id) return null;
     try {
-      const res = await axios.get(`${config.apiBaseUrl}/product/${id}`);
-      return res.data.product;
+      const res = await axios.get(`${config.apiBaseUrl}/products/${id}`);
+      return res.data || null;
     } catch (err) {
       console.error("Failed to fetch product by ID", err);
       return null;
     }
   };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   return { products, loading, getProductById, getProductByIdFromApi };
 };

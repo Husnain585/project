@@ -97,7 +97,9 @@ export const GlobalProvider = ({ children }) => {
     setCartCount(0);
     localStorage.removeItem(config.storageKeys.cart);
   };
-
+  const calculateTotal = () => {
+    return cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  };
   // ---------------------------------------------------
   // 📌 WISHLIST
   // ---------------------------------------------------
@@ -106,7 +108,10 @@ export const GlobalProvider = ({ children }) => {
       if (prev.some((p) => p.id === product.id)) return prev;
       const updated = [...prev, product];
       setWishlistCount(updated.length);
-      localStorage.setItem(config.storageKeys.wishlist, JSON.stringify(updated));
+      localStorage.setItem(
+        config.storageKeys.wishlist,
+        JSON.stringify(updated)
+      );
       return updated;
     });
   };
@@ -115,7 +120,10 @@ export const GlobalProvider = ({ children }) => {
     setWishlist((prev) => {
       const updated = prev.filter((p) => p.id !== productId);
       setWishlistCount(updated.length);
-      localStorage.setItem(config.storageKeys.wishlist, JSON.stringify(updated));
+      localStorage.setItem(
+        config.storageKeys.wishlist,
+        JSON.stringify(updated)
+      );
       return updated;
     });
   };
@@ -174,6 +182,7 @@ export const GlobalProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         clearCart,
+        calculateTotal,
 
         // Wishlist
         wishlist,
