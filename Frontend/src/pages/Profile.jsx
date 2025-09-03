@@ -1,192 +1,145 @@
 // src/pages/Profile.jsx
-import React, { useEffect, useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
-import { useGlobalContext } from "../context/GlobalContext";
+import React, { useState, useEffect } from "react";
+import useUser from "../hooks/useUser";
 
 const Profile = () => {
-  const { user, setUser, token, setToken } = useGlobalContext();
+  const { user, updateUser, deleteUser, changePassword, fetchUser } = useUser();
 
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-  });
-  const [loading, setLoading] = useState(true);
-  const [changingPassword, setChangingPassword] = useState(false);
-  const [passwords, setPasswords] = useState({
-    currentPassword: "",
-    newPassword: "",
-  });
-  const [message, setMessage] = useState("");
+  // Local form states
+  const [profileForm, setProfileForm] = useState({ name: "", email: "" });
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [loadingProfile, setLoadingProfile] = useState(false);
+  const [loadingPassword, setLoadingPassword] = useState(false);
 
-  // Fetch user profile
+  // Initialize form with user data
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await axiosInstance.get("/user/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(res.data);
-        setForm({
-          username: res.data.username || "",
-          email: res.data.email || "",
-        });
-      } catch (err) {
-        console.error("❌ Failed to fetch profile:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [token, setUser]);
+    if (user) setProfileForm({ name: user.name || "", email: user.email || "" });
+  }, [user]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleUpdate = async (e) => {
+  // Handle profile update
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    setLoadingProfile(true);
     try {
-      const res = await axiosInstance.post("/user/update", form, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(res.data.user || res.data);
-      setMessage("✅ Profile updated successfully");
+      await updateUser(profileForm);
+      alert("Profile updated successfully!");
+      fetchUser(); // refresh user data
     } catch (err) {
-      console.error("❌ Failed to update profile:", err);
-      setMessage("❌ Failed to update profile");
+      console.error(err);
+      alert("Failed to update profile.");
+    } finally {
+      setLoadingProfile(false);
     }
   };
 
+  // Handle password change
   const handlePasswordChange = async (e) => {
     e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert("New password and confirm password do not match.");
+      return;
+    }
+    setLoadingPassword(true);
     try {
-      await axiosInstance.post("/user/change-password", passwords, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setMessage("✅ Password changed successfully");
-      setPasswords({ currentPassword: "", newPassword: "" });
-      setChangingPassword(false);
+      await changePassword({ currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword });
+      alert("Password changed successfully!");
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
     } catch (err) {
-      console.error("❌ Failed to change password:", err);
-      setMessage("❌ Failed to change password");
+      console.error(err);
+      alert("Failed to change password.");
+    } finally {
+      setLoadingPassword(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete your account?")) return;
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("Are you sure you want to delete your account? This cannot be undone.")) return;
     try {
-      await axiosInstance.delete("/user/delete", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setToken(null);
-      setUser(null);
-      setMessage("✅ Account deleted");
+      await deleteUser();
+      alert("Account deleted successfully!");
+      // Optionally redirect to login page
+      window.location.href = "/";
     } catch (err) {
-      console.error("❌ Failed to delete account:", err);
-      setMessage("❌ Failed to delete account");
+      console.error(err);
+      alert("Failed to delete account.");
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading profile...</p>;
+  if (!user) return <p className="text-center mt-10">Loading user...</p>;
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold mb-6">My Profile</h1>
-
-      {message && (
-        <p className="mb-4 text-center text-sm text-blue-600">{message}</p>
-      )}
+    <div className="max-w-2xl mx-auto p-6 space-y-10">
+      <h1 className="text-3xl font-bold text-center">My Profile</h1>
 
       {/* Profile Update Form */}
-      <form
-        onSubmit={handleUpdate}
-        className="bg-white p-6 rounded-lg shadow space-y-4 max-w-md"
-      >
-        <div>
-          <label className="block font-medium mb-1">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2"
-          />
-        </div>
+      <form onSubmit={handleProfileUpdate} className="space-y-4 border p-6 rounded shadow-md">
+        <h2 className="text-xl font-semibold">Update Profile</h2>
+        <input
+          type="text"
+          placeholder="Name"
+          value={profileForm.name}
+          onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={profileForm.email}
+          onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+          className="w-full border rounded px-3 py-2"
+        />
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          disabled={loadingProfile}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          Update Profile
+          {loadingProfile ? "Updating..." : "Update Profile"}
         </button>
       </form>
 
-      {/* Password Change */}
-      <div className="mt-10 max-w-md">
-        {!changingPassword ? (
-          <button
-            onClick={() => setChangingPassword(true)}
-            className="text-blue-600 hover:underline"
-          >
-            Change Password
-          </button>
-        ) : (
-          <form
-            onSubmit={handlePasswordChange}
-            className="bg-white p-6 rounded-lg shadow space-y-4"
-          >
-            <div>
-              <label className="block font-medium mb-1">Current Password</label>
-              <input
-                type="password"
-                name="currentPassword"
-                value={passwords.currentPassword}
-                onChange={(e) =>
-                  setPasswords({ ...passwords, currentPassword: e.target.value })
-                }
-                required
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block font-medium mb-1">New Password</label>
-              <input
-                type="password"
-                name="newPassword"
-                value={passwords.newPassword}
-                onChange={(e) =>
-                  setPasswords({ ...passwords, newPassword: e.target.value })
-                }
-                required
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Save New Password
-            </button>
-          </form>
-        )}
-      </div>
+      {/* Password Change Form */}
+      <form onSubmit={handlePasswordChange} className="space-y-4 border p-6 rounded shadow-md">
+        <h2 className="text-xl font-semibold">Change Password</h2>
+        <input
+          type="password"
+          placeholder="Current Password"
+          value={passwordForm.currentPassword}
+          onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          type="password"
+          placeholder="New Password"
+          value={passwordForm.newPassword}
+          onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+          className="w-full border rounded px-3 py-2"
+        />
+        <input
+          type="password"
+          placeholder="Confirm New Password"
+          value={passwordForm.confirmPassword}
+          onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+          className="w-full border rounded px-3 py-2"
+        />
+        <button
+          type="submit"
+          disabled={loadingPassword}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
+        >
+          {loadingPassword ? "Updating..." : "Change Password"}
+        </button>
+      </form>
 
       {/* Delete Account */}
-      <div className="mt-10">
+      <div className="border p-6 rounded shadow-md text-center">
+        <h2 className="text-xl font-semibold text-red-600">Delete Account</h2>
+        <p className="text-gray-600 mb-4">This action is irreversible.</p>
         <button
-          onClick={handleDelete}
+          onClick={handleDeleteAccount}
           className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
         >
-          Delete Account
+          Delete My Account
         </button>
       </div>
     </div>
