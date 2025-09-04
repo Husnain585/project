@@ -3,9 +3,11 @@ import { useState, useContext } from "react";
 import useCart from "./useCart";
 import useUser from "./useUser";
 import axiosInstance from "../utils/axiosInstance";
+import { useNavigate } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalContext"; // 👈 import context
 
 const useCheckout = () => {
+  const navigate = useNavigate();
   const { cart, calculateTotal, clearCart } = useCart();
   const { user } = useUser(); // logged-in user
 
@@ -54,7 +56,13 @@ const useCheckout = () => {
         },
       });
       console.log(res.data);
-
+      navigate("/order-success", {
+        state: {
+          order: res.data.order,
+          items: res.data.items,
+          shippingAddress: payload.shippingAddress,
+        },
+      });
       setSuccess(true);
       clearCart();
     } catch (error) {

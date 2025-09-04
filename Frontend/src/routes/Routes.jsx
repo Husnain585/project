@@ -14,16 +14,16 @@ import CategoryProducts from "../components/categoryProduct/CategoryProducts";
 import Profile from "../pages/Profile";
 import Contact from "../pages/Contact";
 import Checkout from "../pages/Checkout";
+import OrderSuccess from "../pages/OrderSuccess"; // ✅ import OrderSuccess
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Home />} />
     <Route path="/products" element={<Products />} />
     <Route path="/categories" element={<Categories />} />
-    {/* ✅ Dynamic route for category products */}
     <Route path="/category/:categoryId" element={<CategoryProducts />} />
-
     <Route path="/about" element={<About />} />
+    
     <Route
       path="/wishlist"
       element={
@@ -32,26 +32,17 @@ const AppRoutes = () => (
         </ProtectedRoute>
       }
     />
-    <Route
-      path="/checkout"
-      element={
-          <Checkout />
-      }
-    />
-    <Route
-      path="/cart"
-      element={
-          <Cart />
-      }
-    />
+    <Route path="/checkout" element={<Checkout />} />
+    <Route path="/cart" element={<Cart />} />
     <Route path="/profile" element={<Profile />} />
     <Route path="/contact" element={<Contact />} />
-
-
 
     <Route path="/login" element={<Login />} />
     <Route path="/register" element={<Register />} />
     <Route path="/product/:productId" element={<ProductDetails />} />
+
+    {/* ✅ Order Success Route */}
+    <Route path="/order-success" element={<OrderSuccess />} />
   </Routes>
 );
 
