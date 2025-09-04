@@ -6,55 +6,53 @@ module.exports = {
   // Create a new Order from User's Cart
   createOrder: async (req, res) => {
     try {
-      const userId = req.user.userId;
-
-      // 1. Fetch user cart
-      const cart = await Cart.findOne({
-        where: { userId },
-        include: [{ model: CartItem, include: [Product] }],
-      });
-
-      console.log(cart);
-      if (!cart || cart.CartItems.length === 0) {
-        return res.status(400).json({
-          error: "Cart is empty",
-          details: "Add items to cart before placing an order",
-        });
+      // ✅ Get user ID from JWT or payload
+      const userId = req.user?.userId || req.body.userId;
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
       }
 
-      // 2. Create new order
+      // ✅ Get items and shipping from frontend payload
+      const { items, shippingAddress } = req.body;
+      if (!items || items.length === 0) {
+        return res.status(400).json({ error: "No items provided" });
+      }
+
+      // ✅ Calculate total amount
+      const totalAmount = items.reduce(
+        (sum, item) => sum + item.quantity * parseFloat(item.price),
+        0
+      );
+
+      // 1. Create the order
       const order = await Order.create({
         userId,
-        status: "pending", // default
-        totalAmount: cart.CartItems.reduce(
-          (sum, item) => sum + item.quantity * item.Product.price,
-          0
-        ),
+        status: "pending",
+        totalAmount,
+        shippingAddress: JSON.stringify(shippingAddress || {}),
       });
 
-      // 3. Create order items
+      // 2. Create order items
       const orderItems = await Promise.all(
-        cart.CartItems.map((item) =>
+        items.map((item) =>
           OrderItem.create({
             orderId: order.orderId,
             productId: item.productId,
             quantity: item.quantity,
-            price: item.Product.price,
+            price: parseFloat(item.price),
           })
         )
       );
 
-      // 4. Optionally create Payment (default status pending)
+      // 3. Create payment entry (default COD)
       const payment = await Payment.create({
         orderId: order.orderId,
-        amount: order.totalAmount,
+        amount: totalAmount,
         status: "pending",
-        method: "cod", // or "cod", "card", etc.
+        method: "cod",
       });
 
-      // 5. Clear user cart
-      await CartItem.destroy({ where: { cartId: cart.cartId } });
-
+      // ✅ Return success response
       res.status(201).json({
         message: "Order created successfully",
         order,
@@ -66,7 +64,6 @@ module.exports = {
       res.status(500).json({ error: "Server error", details: error.message });
     }
   },
-
   // Get logged-in user's orders
   getUserOrders: async (req, res) => {
     try {
@@ -109,16 +106,18 @@ module.exports = {
 
       const order = await Order.findOne({
         where: { orderId: orderId, userId },
-        include: [ {
-      model: OrderItem,
-      as: "items", 
-      include: [
-        {
-          model: Product,
-          as: "product", 
-        },
-      ],
-    },],
+        include: [
+          {
+            model: OrderItem,
+            as: "items",
+            include: [
+              {
+                model: Product,
+                as: "product",
+              },
+            ],
+          },
+        ],
       });
 
       if (!order) {

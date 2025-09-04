@@ -1,10 +1,15 @@
 // src/hooks/useCheckout.js
-import { useState } from "react";
+import { useState, useContext } from "react";
 import useCart from "./useCart";
+import useUser from "./useUser";
 import axiosInstance from "../utils/axiosInstance";
+import { GlobalContext } from "../context/GlobalContext"; // 👈 import context
 
 const useCheckout = () => {
   const { cart, calculateTotal, clearCart } = useCart();
+  const { user } = useUser(); // logged-in user
+
+  const { auth } = useContext(GlobalContext); // 👈 get auth from context (token, etc.)
 
   const [shipping, setShipping] = useState({
     fullName: "",
@@ -25,20 +30,38 @@ const useCheckout = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      // 🔹 In real app → Send order to backend
-      await axiosInstance.post("/order", {
-        shipping,
-        items: cart,
-        total: calculateTotal(),
+    try {
+      const payload = {
+        userId: user?.userId,
+        items: cart.map((item) => ({
+          productId: item.product?.productId,
+          name: item.product?.name,
+          quantity: item.quantity,
+          price: parseFloat(item.product?.price),
+        })),
+        shippingAddress: shipping,
+        totalPrice: calculateTotal(),
+      };
+
+      console.log("📦 Sending order payload:", payload);
+
+      // ✅ send token via Authorization header
+      const res = await axiosInstance.post("/order", payload, {
+        headers: {
+          Authorization: `Bearer ${auth?.token}`, // 👈 add token from context
+        },
       });
+      console.log(res.data);
 
       setSuccess(true);
       clearCart();
-    } catch (err) {
-      console.error("❌ Checkout failed:", err);
+    } catch (error) {
+      console.error(
+        "❌ Checkout failed:",
+        error.response?.data || error.message
+      );
     } finally {
       setLoading(false);
     }

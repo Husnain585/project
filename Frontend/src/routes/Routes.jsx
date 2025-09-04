@@ -13,6 +13,7 @@ import ProtectedRoute from "../routes/ProtectedRoute";
 import CategoryProducts from "../components/categoryProduct/CategoryProducts";
 import Profile from "../pages/Profile";
 import Contact from "../pages/Contact";
+import Checkout from "../pages/Checkout";
 
 const AppRoutes = () => (
   <Routes>
@@ -29,6 +30,12 @@ const AppRoutes = () => (
         <ProtectedRoute>
           <Wishlist />
         </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/checkout"
+      element={
+          <Checkout />
       }
     />
     <Route

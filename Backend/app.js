@@ -17,6 +17,7 @@ const categoryRoutes = require("./src/routes/category.route");
 const productImageRoutes = require("./src/routes/productImage.route");
 const wishlist = require("./src/routes/wishlist.route");
 const orderRoutes = require("./src/routes/order.route");
+const checkoutRoutes = require("./src/routes/checkout.route");
 
 // CORS
 const allowedOrigins = [
@@ -50,6 +51,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/product-image", productImageRoutes);
 app.use("/api/wishlist", wishlist);
 app.use("/api/order", orderRoutes);
+app.use("/api/checkout", checkoutRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

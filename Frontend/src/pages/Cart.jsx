@@ -2,6 +2,7 @@
 import React, { useContext } from "react";
 import useCart from "../hooks/useCart";
 import { GlobalContext } from "../context/GlobalContext";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const {updateQuantity} = useContext(GlobalContext)
@@ -73,9 +74,9 @@ const Cart = () => {
         <h2 className="text-2xl font-bold">
           Total: ${calculateTotal().toFixed(2)}
         </h2>
-        <button className="mt-4 md:mt-0 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-          Proceed to Checkout
-        </button>
+        <Link to="/checkout" className="mt-4 md:mt-0 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+        Proceed to Checkout</Link>
+        
       </div>
     </div>
   );
