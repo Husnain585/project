@@ -19,16 +19,20 @@ ProductImage.init(
         model: Product,
         key: "productId",
       },
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
+      onDelete: "CASCADE", // delete images when product is deleted
     },
-    imageUrl: {
-      type: DataTypes.STRING(500),
+    url: {
+      type: DataTypes.STRING,
       allowNull: false,
+      defaultValue : "https://unsplash.com/photos/white-and-brown-plastic-bottles-nwOip8AOZz0",
     },
     altText: {
-      type: DataTypes.STRING(200),
+      type: DataTypes.STRING,
       allowNull: true,
+    },
+    isPrimary: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
   },
   {
@@ -37,6 +41,22 @@ ProductImage.init(
     tableName: "product_images",
     timestamps: true,
     paranoid: true,
+    hooks: {
+      // Before saving (create/update), enforce one primary image per product
+      async beforeSave(image) {
+        if (image.isPrimary) {
+          await ProductImage.update(
+            { isPrimary: false },
+            {
+              where: {
+                productId: image.productId,
+                imageId: { [connection.Sequelize.Op.ne]: image.imageId }, // exclude current image
+              },
+            }
+          );
+        }
+      },
+    },
   }
 );
 

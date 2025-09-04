@@ -1,5 +1,4 @@
-// src/components/products/ProductCard.jsx
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHeart,
@@ -10,6 +9,7 @@ import {
 import useCart from "../../hooks/useCart";
 import useWishlist from "../../hooks/useWishlist";
 import { formatCurrency } from "../../utils/format";
+import ProductQuickViewModal from "./ProductQuickViewModal";
 
 const Stars = ({ rating = 0 }) => {
   const full = Math.floor(rating);
@@ -31,55 +31,85 @@ const Stars = ({ rating = 0 }) => {
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
 
-  const pid = product?.id ?? product?.productId;
-  const liked = isInWishlist(pid);
+  const liked = isInWishlist(product.productId);
+  const discounted = product.originalPrice && product.originalPrice > product.price;
+  const discountPercent = discounted
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
 
-  const image =
-    product?.images?.[0]?.imageUrl || "https://picsum.photos/seed/fallback/600/600";
+  const image = product.images?.[0]?.url || "https://picsum.photos/600/600?random=1";
 
-  const handleWishlistClick = () => {
-    toggleWishlist(product);
-  };
-
-  const handleAddToCart = () => {
-    addToCart(product, 1);
-  };
+  const handleWishlistClick = () => toggleWishlist(product);
+  const handleAddToCart = () => addToCart(product, 1);
 
   return (
-    <div className="group bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden border border-gray-100">
-      <div className="relative">
-        <img src={image} alt={product?.name} className="w-full h-56 object-cover" />
-        <button
-          aria-label="wishlist"
-          onClick={handleWishlistClick}
-          className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-2 rounded-full shadow hover:scale-105 transition"
-          title={liked ? "Remove from wishlist" : "Add to wishlist"}
-        >
-          <FontAwesomeIcon icon={faHeart} className={liked ? "text-red-500" : "text-gray-700"} />
-        </button>
-      </div>
+    <>
+      <div className="group relative bg-white dark:bg-gray-800 rounded-2xl shadow hover:shadow-lg border border-gray-100 overflow-hidden transition">
+        {discounted && (
+          <span className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold z-10">
+            -{discountPercent}%
+          </span>
+        )}
 
-      <div className="p-4">
-        <p className="text-xs uppercase tracking-wide text-gray-500">
-          {product?.category?.name || "General"}
-        </p>
-        <h3 className="font-semibold mt-1 line-clamp-1">{product?.name}</h3>
+        <div className="relative">
+          <img
+            src={image}
+            alt={product.name}
+            className="w-full h-56 object-cover transition-transform duration-300 group-hover:scale-105 rounded-t-2xl"
+          />
 
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-lg font-bold">{formatCurrency(product?.price)}</span>
-          <Stars rating={product?.rating} />
+          <button
+            onClick={handleWishlistClick}
+            className="absolute top-3 right-3 bg-white/90 dark:bg-gray-700/80 backdrop-blur px-2 py-2 rounded-full shadow hover:scale-105 transition"
+          >
+            <FontAwesomeIcon icon={faHeart} className={liked ? "text-red-500" : "text-gray-700"} />
+          </button>
         </div>
 
-        <button
-          onClick={handleAddToCart}
-          className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition"
-        >
-          <FontAwesomeIcon icon={faCartPlus} />
-          Add to Cart
-        </button>
+        <div className="p-4 flex flex-col justify-between">
+          <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            {product.category?.name || "General"}
+          </p>
+          <h3 className="font-semibold mt-1 line-clamp-1 text-gray-900 dark:text-white">{product.name}</h3>
+          <Stars rating={product.rating} />
+
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{formatCurrency(product.price)}</span>
+            {discounted && (
+              <span className="line-through text-gray-400 text-sm">{formatCurrency(product.originalPrice)}</span>
+            )}
+          </div>
+
+          <p className={`mt-1 text-sm font-medium ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}>
+            {product.stock > 0 ? "In Stock" : "Out of Stock"}
+          </p>
+
+          <div className="mt-4 flex gap-2 flex-wrap">
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+              className={`flex-1 inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition ${
+                product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              <FontAwesomeIcon icon={faCartPlus} />
+              Add to Cart
+            </button>
+
+            <button
+              onClick={() => setQuickViewOpen(true)}
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+            >
+              Quick View
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {quickViewOpen && <ProductQuickViewModal product={product} onClose={() => setQuickViewOpen(false)} />}
+    </>
   );
 };
 

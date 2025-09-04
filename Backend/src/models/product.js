@@ -29,6 +29,11 @@ Product.init(
       allowNull: false,
       defaultValue: 0,
     },
+    // ❌ Removed `images` column (handled by ProductImage association)
+    originalPrice: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
     categoryId: {
       type: DataTypes.UUID,
       allowNull: false,

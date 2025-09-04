@@ -1,11 +1,22 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore from "swiper";
+import {Pagination, Navigation} from  "swiper/modules"
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
 import useProducts from "../hooks/useProducts";
 import useCart from "../hooks/useCart";
 import { GlobalContext } from "../context/GlobalContext";
+import { formatCurrency } from "../utils/format";
 import axios from "axios";
 import config from "../config/config";
+
+// Install Swiper modules
+SwiperCore.use([Navigation, Pagination]);
 
 const ProductDetails = () => {
   const { productId } = useParams();
@@ -22,12 +33,9 @@ const ProductDetails = () => {
 
   // Fetch product details
   useEffect(() => {
-    const fetchProduct = async () => {
-      if (!productId) return;
-      let p = productsHook.getProductById(productId);
-      setProduct(p || null);
-    };
-    fetchProduct();
+    if (!productId) return;
+    const p = productsHook.getProductById(productId);
+    setProduct(p || null);
   }, [productId, productsHook]);
 
   // Fetch product images
@@ -36,11 +44,10 @@ const ProductDetails = () => {
       if (!productId) return;
       try {
         setLoadingImages(true);
-        const res = await axios.get(
-          `${config.apiBaseUrl}/product-image/${productId}`
-        );
+        const res = await axios.get(`${config.apiBaseUrl}/product-image/${productId}`);
         setImages(res.data.images || []);
-      } catch {
+      } catch (err) {
+        console.error(err);
         setImages([]);
       } finally {
         setLoadingImages(false);
@@ -64,6 +71,10 @@ const ProductDetails = () => {
     }
   };
 
+  const handleAddToWishlist = () => {
+    if (!isInWishlist) addToWishlist(product);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -73,51 +84,86 @@ const ProductDetails = () => {
     >
       <div className="flex flex-col md:flex-row gap-8">
         {/* Product Images */}
-        <div className="md:w-1/2 flex flex-col gap-4">
+        <div className="md:w-1/2">
           {loadingImages ? (
             <p>Loading images...</p>
           ) : images.length > 0 ? (
-            images.map((img, idx) => (
-              <motion.img
-                key={idx}
-                src={img.imageUrl}
-                alt={img.imageId || product.name}
-                className="w-full h-64 object-cover rounded-lg"
-                whileHover={{ scale: 1.05 }}
-              />
-            ))
+            <Swiper
+            modules={[Navigation, Pagination]}
+              navigation
+              pagination={{ clickable: true }}
+              spaceBetween={20}
+              slidesPerView={1}
+              className="rounded-lg"
+            >
+              {images.map((img, idx) => (
+                <SwiperSlide key={idx}>
+                  <img
+                    src={img.url || img.imageUrl}
+                    alt={img.id || product.name}
+                    className="w-full h-96 object-cover rounded-lg"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           ) : (
             <img
-              src="https://via.placeholder.com/400x300"
+              src="https://via.placeholder.com/400x400"
               alt={product.name}
-              className="w-full h-64 object-cover rounded-lg"
+              className="w-full h-96 object-cover rounded-lg"
             />
           )}
         </div>
 
         {/* Product Info */}
-        <div className="md:w-1/2 flex flex-col justify-between">
+        <div className="md:w-1/2 flex flex-col justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-            <p className="text-xl text-blue-600 font-semibold mb-4">
-              ${product.price ?? "N/A"}
+            <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+
+            {/* Price & Discount */}
+            <div className="flex items-center gap-4 mb-4">
+              <span className="text-xl text-blue-600 font-semibold">
+                {formatCurrency(product.price)}
+              </span>
+              {product.originalPrice && product.originalPrice > product.price && (
+                <span className="text-sm text-red-500 line-through">
+                  {formatCurrency(product.originalPrice)}
+                </span>
+              )}
+              {product.originalPrice && product.originalPrice > product.price && (
+                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                  {Math.round(
+                    ((product.originalPrice - product.price) / product.originalPrice) * 100
+                  )}
+                  % OFF
+                </span>
+              )}
+            </div>
+
+            {/* Stock */}
+            <p
+              className={`mb-4 font-semibold ${
+                product.stock > 0 ? "text-green-600" : "text-red-500"
+              }`}
+            >
+              {product.stock > 0 ? `In Stock: ${product.stock}` : "Out of Stock"}
             </p>
-            <p className="mb-4">{product.description || "No description."}</p>
-            <p className="text-sm text-gray-500 mb-6">
-              Category: <em>{product.categoryId || "N/A"}</em>
+
+            <p className="mb-4">{product.description || "No description available."}</p>
+            <p className="text-sm text-gray-500 mb-2">
+              Category: <em>{product.category?.name || "N/A"}</em>
             </p>
-            <p className="text-sm text-gray-400">
-              Product ID: <strong>{productId}</strong>
-            </p>
+            <p className="text-sm text-gray-400">Product ID: <strong>{productId}</strong></p>
           </div>
 
-          <div className="flex gap-4 flex-wrap mt-4">
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-4 mt-4">
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={handleAddToCart}
-              disabled={adding}
-              className={`bg-blue-600 text-white py-3 rounded-lg transition font-semibold hover:bg-blue-700 ${
-                adding ? "opacity-50 cursor-not-allowed" : ""
+              disabled={adding || product.stock <= 0}
+              className={`bg-blue-600 text-white py-3 px-6 rounded-lg transition font-semibold hover:bg-blue-700 ${
+                adding || product.stock <= 0 ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {adding ? "Adding..." : "Add to Cart"}
@@ -125,7 +171,7 @@ const ProductDetails = () => {
 
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={() => !isInWishlist && addToWishlist(product)}
+              onClick={handleAddToWishlist}
               disabled={isInWishlist}
               className={`py-3 px-6 rounded-lg transition font-semibold ${
                 isInWishlist
