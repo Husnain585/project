@@ -1,25 +1,49 @@
-// src/pages/About.jsx
+"use client";
+
 import React from "react";
 import { motion } from "framer-motion";
+
+// SectionDivider with optional label in the center
+const SectionDivider = ({ label, color, thickness = 1 }) => {
+  const lineStyle = {
+    borderTopWidth: `${thickness}px`,
+    borderColor: color || "#13131d",
+  };
+
+  return (
+    <div className="flex items-center w-full my-16">
+      <div className="flex-grow border-t border-solid" style={lineStyle}></div>
+      {label && (
+        <span className="flex items-center px-4 text-sm text-zinc-500 font-medium">
+          {label}
+        </span>
+      )}
+      <div className="flex-grow border-t border-solid" style={lineStyle}></div>
+    </div>
+  );
+};
 
 const About = () => {
   return (
     <div className="container mx-auto px-4 py-16">
+
       {/* Hero Section */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-center mb-16"
+        className="flex flex-col items-center text-center mb-16"
       >
         <h1 className="text-4xl md:text-5xl font-extrabold text-blue-600 mb-4">
           About <span className="text-gray-800">MyShop</span>
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-600 max-w-2xl">
           Your trusted online destination for the latest products, unbeatable
-          deals, and a seamless shopping experience.  
+          deals, and a seamless shopping experience.
         </p>
       </motion.div>
+
+      <SectionDivider label="Our Story" />
 
       {/* Our Story */}
       <motion.div
@@ -27,15 +51,14 @@ const About = () => {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
-        className="grid md:grid-cols-2 gap-10 items-center mb-20"
+        className="flex flex-col md:flex-row gap-10 items-center mb-20"
       >
         <img
           src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
           alt="Our Store"
-          className="rounded-2xl shadow-lg"
+          className="rounded-2xl shadow-lg w-full md:w-1/2"
         />
-        <div>
-          <h2 className="text-3xl font-bold mb-4">Our Story</h2>
+        <div className="md:w-1/2 text-left">
           <p className="text-gray-600 leading-relaxed mb-4">
             We started MyShop with one mission: to bring premium quality
             products closer to you at the best prices. From fashion to
@@ -49,6 +72,8 @@ const About = () => {
         </div>
       </motion.div>
 
+      <SectionDivider label="Why Choose Us" />
+
       {/* Why Choose Us */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -57,9 +82,6 @@ const About = () => {
         transition={{ duration: 0.7 }}
         className="mb-20"
       >
-        <h2 className="text-3xl font-bold text-center mb-10">
-          Why Choose <span className="text-blue-600">Us?</span>
-        </h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
             {
@@ -87,6 +109,8 @@ const About = () => {
         </div>
       </motion.div>
 
+      <SectionDivider label="Our Stats" />
+
       {/* Stats Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -113,6 +137,8 @@ const About = () => {
         ))}
       </motion.div>
 
+      <SectionDivider label="Join Us" />
+
       {/* Call to Action */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -133,6 +159,7 @@ const About = () => {
           Start Shopping
         </a>
       </motion.div>
+
     </div>
   );
 };
