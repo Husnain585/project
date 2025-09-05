@@ -1,6 +1,7 @@
 import React, { createContext, useEffect, useState, useContext, useMemo } from "react";
 import config from "../config/config";
 import axiosInstance from "../utils/axiosInstance";
+import ThemeContext, {ThemeProvider} from "./ThemeContext";
 
 export const GlobalContext = createContext(null);
 
@@ -157,6 +158,7 @@ export const GlobalProvider = ({ children }) => {
   const isInWishlist = (productId) => wishlist.some((p) => getId(p) === getId(productId));
 
   return (
+    <ThemeProvider>
     <GlobalContext.Provider
       value={{
         // Auth/User
@@ -171,6 +173,7 @@ export const GlobalProvider = ({ children }) => {
     >
       {children}
     </GlobalContext.Provider>
+      </ThemeProvider>
   );
 };
 
