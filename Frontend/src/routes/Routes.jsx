@@ -14,6 +14,7 @@ const About = lazy(() => import("../pages/About"));
 const Wishlist = lazy(() => import("../pages/Wishlist"));
 const Cart = lazy(() => import("../pages/Cart"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
+const Shop = lazy(() => import("../pages/Shop"));
 const CategoryProducts = lazy(() => import("../components/categoryProduct/CategoryProducts"));
 const Profile = lazy(() => import("../pages/Profile"));
 const Contact = lazy(() => import("../pages/Contact"));
@@ -21,6 +22,7 @@ const Checkout = lazy(() => import("../pages/Checkout"));
 const OrderSuccess = lazy(() => import("../pages/OrderSuccess"));
 
 const Spinner = lazy(() => import("../components/ui/loadingSpinner/Spinner"));
+
 // Framer Motion page animation
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -46,14 +48,28 @@ const AppRoutes = () => {
 
   return (
     <AnimatePresence mode="wait">
-      <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Spinner /></div>}>
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <Spinner />
+          </div>
+        }
+      >
         <Routes location={location} key={location.pathname}>
+          {/* Public Routes */}
           <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
           <Route path="/products" element={<PageWrapper><Products /></PageWrapper>} />
           <Route path="/categories" element={<PageWrapper><Categories /></PageWrapper>} />
           <Route path="/category/:categoryId" element={<PageWrapper><CategoryProducts /></PageWrapper>} />
           <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+          <Route path="/shop" element={<PageWrapper><Shop /></PageWrapper>} />
+          <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+          <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
+          <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
+          <Route path="/product/:productId" element={<PageWrapper><ProductDetails /></PageWrapper>} />
 
+          {/* Protected Routes */}
           <Route
             path="/wishlist"
             element={
@@ -62,15 +78,38 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/checkout" element={<PageWrapper><Checkout /></PageWrapper>} />
-          <Route path="/cart" element={<PageWrapper><Cart /></PageWrapper>} />
-          <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
-          <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
-          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-          <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
-          <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
-          <Route path="/product/:productId" element={<PageWrapper><ProductDetails /></PageWrapper>} />
-          <Route path="/order-success" element={<PageWrapper><OrderSuccess /></PageWrapper>} />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <PageWrapper><Cart /></PageWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <PageWrapper><Profile /></PageWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <PageWrapper><Checkout /></PageWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order-success"
+            element={
+              <ProtectedRoute>
+                <PageWrapper><OrderSuccess /></PageWrapper>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Suspense>
     </AnimatePresence>
