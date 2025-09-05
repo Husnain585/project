@@ -7,6 +7,7 @@ import ProtectedRoute from "../routes/ProtectedRoute";
 const Home = lazy(() => import("../pages/Home"));
 const Login = lazy(() => import("../pages/auth/Login"));
 const Register = lazy(() => import("../pages/auth/Register"));
+const ForgotPassword = lazy(() => import("../pages/auth/ForgetPassword"));
 const Products = lazy(() => import("../pages/Products"));
 const Categories = lazy(() => import("../pages/Categories"));
 const About = lazy(() => import("../pages/About"));
@@ -66,6 +67,7 @@ const AppRoutes = () => {
           <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
           <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+          <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
           <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
           <Route path="/product/:productId" element={<PageWrapper><ProductDetails /></PageWrapper>} />
           <Route path="/order-success" element={<PageWrapper><OrderSuccess /></PageWrapper>} />
