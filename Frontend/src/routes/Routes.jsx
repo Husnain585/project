@@ -1,5 +1,8 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+
+// import pages as before...
 import Home from "../pages/Home";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
@@ -14,36 +17,58 @@ import CategoryProducts from "../components/categoryProduct/CategoryProducts";
 import Profile from "../pages/Profile";
 import Contact from "../pages/Contact";
 import Checkout from "../pages/Checkout";
-import OrderSuccess from "../pages/OrderSuccess"; // ✅ import OrderSuccess
+import OrderSuccess from "../pages/OrderSuccess";
 
-const AppRoutes = () => (
-  <Routes>
-    <Route path="/" element={<Home />} />
-    <Route path="/products" element={<Products />} />
-    <Route path="/categories" element={<Categories />} />
-    <Route path="/category/:categoryId" element={<CategoryProducts />} />
-    <Route path="/about" element={<About />} />
-    
-    <Route
-      path="/wishlist"
-      element={
-        <ProtectedRoute>
-          <Wishlist />
-        </ProtectedRoute>
-      }
-    />
-    <Route path="/checkout" element={<Checkout />} />
-    <Route path="/cart" element={<Cart />} />
-    <Route path="/profile" element={<Profile />} />
-    <Route path="/contact" element={<Contact />} />
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 },
+};
 
-    <Route path="/login" element={<Login />} />
-    <Route path="/register" element={<Register />} />
-    <Route path="/product/:productId" element={<ProductDetails />} />
-
-    {/* ✅ Order Success Route */}
-    <Route path="/order-success" element={<OrderSuccess />} />
-  </Routes>
+const PageWrapper = ({ children }) => (
+  <motion.div
+    variants={pageVariants}
+    initial="initial"
+    animate="animate"
+    exit="exit"
+    transition={{ duration: 0.3 }}
+    className="min-h-screen"
+  >
+    {children}
+  </motion.div>
 );
+
+const AppRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
+        <Route path="/products" element={<PageWrapper><Products /></PageWrapper>} />
+        <Route path="/categories" element={<PageWrapper><Categories /></PageWrapper>} />
+        <Route path="/category/:categoryId" element={<PageWrapper><CategoryProducts /></PageWrapper>} />
+        <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
+
+        <Route
+          path="/wishlist"
+          element={
+            <ProtectedRoute>
+              <PageWrapper><Wishlist /></PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/checkout" element={<PageWrapper><Checkout /></PageWrapper>} />
+        <Route path="/cart" element={<PageWrapper><Cart /></PageWrapper>} />
+        <Route path="/profile" element={<PageWrapper><Profile /></PageWrapper>} />
+        <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
+        <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
+        <Route path="/product/:productId" element={<PageWrapper><ProductDetails /></PageWrapper>} />
+        <Route path="/order-success" element={<PageWrapper><OrderSuccess /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 export default AppRoutes;
