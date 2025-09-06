@@ -1,7 +1,13 @@
-import React, { createContext, useEffect, useState, useContext, useMemo } from "react";
+import React, {
+  createContext,
+  useEffect,
+  useState,
+  useContext,
+  useMemo,
+} from "react";
 import config from "../config/config";
 import axiosInstance from "../utils/axiosInstance";
-import ThemeContext, {ThemeProvider} from "./ThemeContext";
+import ThemeContext, { ThemeProvider } from "./ThemeContext";
 
 export const GlobalContext = createContext(null);
 
@@ -14,7 +20,9 @@ export const GlobalProvider = ({ children }) => {
   // Auth/User
   // -------------------------
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem(config.storageKeys.authToken) || null);
+  const [token, setToken] = useState(
+    localStorage.getItem(config.storageKeys.authToken) || null
+  );
   const [loadingUser, setLoadingUser] = useState(false);
 
   // -------------------------
@@ -50,35 +58,54 @@ export const GlobalProvider = ({ children }) => {
   // -------------------------
   useEffect(() => {
     try {
-      const savedCart = JSON.parse(localStorage.getItem(config.storageKeys.cart) || "[]");
+      const savedCart = JSON.parse(
+        localStorage.getItem(config.storageKeys.cart) || "[]"
+      );
       setCart(savedCart);
       setCartCount(savedCart.reduce((acc, i) => acc + safeNum(i.quantity), 0));
-    } catch { setCart([]); setCartCount(0); }
+    } catch {
+      setCart([]);
+      setCartCount(0);
+    }
 
     try {
-      const savedWishlist = JSON.parse(localStorage.getItem(config.storageKeys.wishlist) || "[]");
+      const savedWishlist = JSON.parse(
+        localStorage.getItem(config.storageKeys.wishlist) || "[]"
+      );
       setWishlist(savedWishlist);
       setWishlistCount(savedWishlist.length);
-    } catch { setWishlist([]); setWishlistCount(0); }
+    } catch {
+      setWishlist([]);
+      setWishlistCount(0);
+    }
   }, []);
 
   // -------------------------
   // Fetch current user
   // -------------------------
   const fetchUser = async () => {
-    if (!token) { setUser(null); return; }
+    if (!token) {
+      setUser(null);
+      return;
+    }
     try {
       setLoadingUser(true);
-      const res = await axiosInstance.get("/user/me", { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axiosInstance.get("/user/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUser(res.data.user || res.data);
     } catch (err) {
       console.error("Failed to fetch user:", err);
       setUser(null);
       setToken(null);
-    } finally { setLoadingUser(false); }
+    } finally {
+      setLoadingUser(false);
+    }
   };
 
-  useEffect(() => { fetchUser(); }, [token]);
+  useEffect(() => {
+    fetchUser();
+  }, [token]);
 
   // -------------------------
   // User API actions
@@ -86,27 +113,39 @@ export const GlobalProvider = ({ children }) => {
   const updateUser = async (data) => {
     if (!token) throw new Error("Not authenticated");
     try {
-      const res = await axiosInstance.put("/user/update", data, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axiosInstance.put("/user/update", data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUser(res.data.user || res.data);
       return res.data;
-    } catch (err) { throw err; }
+    } catch (err) {
+      throw err;
+    }
   };
 
   const deleteUser = async () => {
     if (!token) throw new Error("Not authenticated");
     try {
-      await axiosInstance.delete("/user/delete", { headers: { Authorization: `Bearer ${token}` } });
+      await axiosInstance.delete("/user/delete", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setUser(null);
       setToken(null);
-    } catch (err) { throw err; }
+    } catch (err) {
+      throw err;
+    }
   };
 
   const changePassword = async (data) => {
     if (!token) throw new Error("Not authenticated");
     try {
-      const res = await axiosInstance.post("/user/change-password", data, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await axiosInstance.post("/user/change-password", data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return res.data;
-    } catch (err) { throw err; }
+    } catch (err) {
+      throw err;
+    }
   };
 
   // -------------------------
@@ -114,15 +153,27 @@ export const GlobalProvider = ({ children }) => {
   // -------------------------
   useEffect(() => {
     const fetchProducts = async () => {
-      try { setLoadingProducts(true); const res = await axiosInstance.get("/product"); setProducts(res.data.products || res.data || []); }
-      catch (err) { console.error("Failed to fetch products", err); }
-      finally { setLoadingProducts(false); }
+      try {
+        setLoadingProducts(true);
+        const res = await axiosInstance.get("/product");
+        setProducts(res.data.products || res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
+      } finally {
+        setLoadingProducts(false);
+      }
     };
 
     const fetchCategories = async () => {
-      try { setLoadingCategories(true); const res = await axiosInstance.get("/category"); setCategories(res.data.categories || res.data || []); }
-      catch (err) { console.error("Failed to fetch categories", err); }
-      finally { setLoadingCategories(false); }
+      try {
+        setLoadingCategories(true);
+        const res = await axiosInstance.get("/category");
+        setCategories(res.data.categories || res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      } finally {
+        setLoadingCategories(false);
+      }
     };
 
     fetchProducts();
@@ -132,48 +183,203 @@ export const GlobalProvider = ({ children }) => {
   // -------------------------
   // Cart
   // -------------------------
-  const persistCart = (next) => { localStorage.setItem(config.storageKeys.cart, JSON.stringify(next)); setCartCount(next.reduce((acc, i) => acc + safeNum(i.quantity), 0)); };
+  const persistCart = (next) => {
+    localStorage.setItem(config.storageKeys.cart, JSON.stringify(next));
+    setCartCount(next.reduce((acc, i) => acc + safeNum(i.quantity), 0));
+  };
   const addToCart = (input, quantity = 1) => {
-    const product = typeof input === "object" ? input : products.find((p) => getId(p) === getId(input));
+    const product =
+      typeof input === "object"
+        ? input
+        : products.find((p) => getId(p) === getId(input));
     if (!product) return;
     const pid = getId(product);
     setCart((prev) => {
       const ix = prev.findIndex((i) => i.productId === pid);
-      const next = ix >= 0 ? prev.map((i, idx) => idx === ix ? { ...i, quantity: safeNum(i.quantity) + safeNum(quantity) } : i) : [...prev, { productId: pid, product, quantity: safeNum(quantity) }];
-      persistCart(next); return next;
+      const next =
+        ix >= 0
+          ? prev.map((i, idx) =>
+              idx === ix
+                ? { ...i, quantity: safeNum(i.quantity) + safeNum(quantity) }
+                : i
+            )
+          : [...prev, { productId: pid, product, quantity: safeNum(quantity) }];
+      persistCart(next);
+      return next;
     });
   };
-  const updateQty = (productId, nextQty) => { const pid = getId(productId); setCart(prev => { const next = prev.map(i => i.productId === pid ? { ...i, quantity: Math.max(1, safeNum(nextQty)) } : i).filter(i => i.quantity > 0); persistCart(next); return next; }); };
-  const removeFromCart = (productId) => { const pid = getId(productId); setCart(prev => { const next = prev.filter(i => i.productId !== pid); persistCart(next); return next; }); };
-  const clearCart = () => { setCart([]); setCartCount(0); localStorage.removeItem(config.storageKeys.cart); };
-  const calculateTotal = useMemo(() => () => cart.reduce((acc, item) => acc + safeNum(item.product?.price) * safeNum(item.quantity), 0), [cart]);
+  const updateQty = (productId, nextQty) => {
+    const pid = getId(productId);
+    setCart((prev) => {
+      const next = prev
+        .map((i) =>
+          i.productId === pid
+            ? { ...i, quantity: Math.max(1, safeNum(nextQty)) }
+            : i
+        )
+        .filter((i) => i.quantity > 0);
+      persistCart(next);
+      return next;
+    });
+  };
+  const removeFromCart = (productId) => {
+    const pid = getId(productId);
+    setCart((prev) => {
+      const next = prev.filter((i) => i.productId !== pid);
+      persistCart(next);
+      return next;
+    });
+  };
+  const clearCart = () => {
+    setCart([]);
+    setCartCount(0);
+    localStorage.removeItem(config.storageKeys.cart);
+  };
+  const calculateTotal = useMemo(
+    () => () =>
+      cart.reduce(
+        (acc, item) =>
+          acc + safeNum(item.product?.price) * safeNum(item.quantity),
+        0
+      ),
+    [cart]
+  );
 
   // -------------------------
   // Wishlist
   // -------------------------
-  const persistWishlist = (next) => { localStorage.setItem(config.storageKeys.wishlist, JSON.stringify(next)); setWishlistCount(next.length); };
-  const addToWishlist = (product) => { const pid = getId(product); setWishlist(prev => prev.some(p => getId(p) === pid) ? prev : [...prev, product]); persistWishlist([...wishlist, product]); };
-  const removeFromWishlist = (productId) => { const pid = getId(productId); setWishlist(prev => prev.filter(p => getId(p) !== pid)); persistWishlist(wishlist.filter(p => getId(p) !== pid)); };
-  const toggleWishlist = (product) => { const pid = getId(product); setWishlist(prev => prev.some(p => getId(p) === pid) ? prev.filter(p => getId(p) !== pid) : [...prev, product]); persistWishlist(wishlist); };
-  const isInWishlist = (productId) => wishlist.some((p) => getId(p) === getId(productId));
+  const persistWishlist = (next) => {
+    localStorage.setItem(config.storageKeys.wishlist, JSON.stringify(next));
+    setWishlistCount(next.length);
+  };
+  const addToWishlist = (product) => {
+    const pid = getId(product);
+    setWishlist((prev) =>
+      prev.some((p) => getId(p) === pid) ? prev : [...prev, product]
+    );
+    persistWishlist([...wishlist, product]);
+  };
+  const removeFromWishlist = (productId) => {
+    const pid = getId(productId);
+    setWishlist((prev) => prev.filter((p) => getId(p) !== pid));
+    persistWishlist(wishlist.filter((p) => getId(p) !== pid));
+  };
+  const toggleWishlist = (product) => {
+    const pid = getId(product);
+    setWishlist((prev) =>
+      prev.some((p) => getId(p) === pid)
+        ? prev.filter((p) => getId(p) !== pid)
+        : [...prev, product]
+    );
+    persistWishlist(wishlist);
+  };
+  const isInWishlist = (productId) =>
+    wishlist.some((p) => getId(p) === getId(productId));
+
+  // -------------------------
+  // AdminDashboard
+  // -------------------------
+  // -------------------------
+  // AdminDashboard
+  // -------------------------
+  const getAllOrders = async () => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      const res = await axiosInstance.get("/order/admin/all", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data.orders || res.data;
+    } catch (err) {
+      console.error("Failed to fetch all orders", err);
+      throw err;
+    }
+  };
+
+  const statusOrder = async (orderId, status) => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      const res = await axiosInstance.put(
+        `/order/admin/${orderId}/status`,
+        { status },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return res.data.order || res.data;
+    } catch (err) {
+      console.error(`Failed to update order ${orderId} status`, err);
+      throw err;
+    }
+  };
+
+  const createProduct = async (productData) => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      const res = await axiosInstance.post("/product", productData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data.product || res.data;
+    } catch (err) {
+      console.error("Failed to create product", err);
+      throw err;
+    }
+  };
+
+  const createCategory = async (categoryData) => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      const res = await axiosInstance.post("/category", categoryData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.data.category || res.data;
+    } catch (err) {
+      console.error("Failed to create category", err);
+      throw err;
+    }
+  };
 
   return (
     <ThemeProvider>
-    <GlobalContext.Provider
-      value={{
-        // Auth/User
-        user, setUser, token, setToken, loadingUser, fetchUser, updateUser, deleteUser, changePassword,
-        // Products & Categories
-        products, categories, loadingProducts, loadingCategories,
-        // Cart
-        cart, cartCount, addToCart, updateQty, removeFromCart, clearCart, calculateTotal,
-        // Wishlist
-        wishlist, wishlistCount, addToWishlist, removeFromWishlist, toggleWishlist, isInWishlist,
-      }}
-    >
-      {children}
-    </GlobalContext.Provider>
-      </ThemeProvider>
+      <GlobalContext.Provider
+        value={{
+          // Auth/User
+          user,
+          setUser,
+          token,
+          setToken,
+          loadingUser,
+          fetchUser,
+          updateUser,
+          deleteUser,
+          changePassword,
+          // Products & Categories
+          products,
+          categories,
+          loadingProducts,
+          loadingCategories,
+          // Cart
+          cart,
+          cartCount,
+          addToCart,
+          updateQty,
+          removeFromCart,
+          clearCart,
+          calculateTotal,
+          // Wishlist
+          wishlist,
+          wishlistCount,
+          addToWishlist,
+          removeFromWishlist,
+          toggleWishlist,
+          isInWishlist,
+          // Admin
+          getAllOrders,
+          statusOrder,
+          createCategory,
+          createProduct,
+        }}
+      >
+        {children}
+      </GlobalContext.Provider>
+    </ThemeProvider>
   );
 };
 
@@ -182,7 +388,8 @@ export const GlobalProvider = ({ children }) => {
 // -------------------------
 export const useGlobalContext = () => {
   const ctx = useContext(GlobalContext);
-  if (!ctx) throw new Error("useGlobalContext must be used inside <GlobalProvider>");
+  if (!ctx)
+    throw new Error("useGlobalContext must be used inside <GlobalProvider>");
   return ctx;
 };
 
