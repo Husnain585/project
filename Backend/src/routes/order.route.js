@@ -17,7 +17,7 @@ router.get("/:orderId", authMiddleware, getOrderById); // Get single order
 router.put("/:orderId/cancel", authMiddleware, cancelOrder); // Cancel order (only if pending)
 
 // ===== Admin Routes =====
-router.get("/admin/all", authMiddleware,  getAllOrders); // Get all orders
-router.put("/admin/:orderId/status", authMiddleware,  updateOrderStatus); // Update order status
+router.get("/admin/all", authMiddleware, isAdmin.adminCheck,  getAllOrders); // Get all orders
+router.put("/admin/:orderId/status", authMiddleware, isAdmin.adminCheck,  updateOrderStatus); // Update order status
 
 module.exports = router;

@@ -11,7 +11,7 @@ module.exports = {
       return res.status(201).json({ message: "Category created", category });
     } catch (error) {
       console.error("Category Creation Error:", error);
-      return res.status(500).json({ error: "Server error" });
+      return res.status(500).json({ error: "Server error", details: error.message });
     }
   },
   getCategories: async (req, res) => {

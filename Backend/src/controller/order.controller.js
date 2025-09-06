@@ -137,12 +137,14 @@ module.exports = {
   getAllOrders: async (req, res) => {
     try {
       const orders = await Order.findAll({
-        include: [{ model: OrderItem, include: [Product] }],
+        include: [{ model: OrderItem, as: "items", include: [{model:  Product, as: "product"}] }],
       });
       return res.status(200).json({ orders });
     } catch (error) {
       console.error("Get All Orders Error:", error);
-      return res.status(500).json({ error: "Server error" });
+      return res
+        .status(500)
+        .json({ error: "Server error", details: error.message });
     }
   },
 

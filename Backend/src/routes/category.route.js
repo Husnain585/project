@@ -2,8 +2,12 @@ const express = require("express");
 const router = express.Router();
 const {createCategory, getCategories, getCategoryById} = require("../controller/category.controller");
 const authMiddleware = require("../middleware/authCheck.middleware");
+const authCheckMiddleware = require("../middleware/authCheck.middleware");
 
-router.post("/", authMiddleware,  createCategory);
+// Protected Routes
+router.post("/", authMiddleware, authCheckMiddleware, createCategory);
+
+// Public 
 router.get("/",  getCategories);
 router.get("/:id",  getCategoryById);
 

@@ -20,6 +20,7 @@ const Profile = lazy(() => import("../pages/Profile"));
 const Contact = lazy(() => import("../pages/Contact"));
 const Checkout = lazy(() => import("../pages/Checkout"));
 const OrderSuccess = lazy(() => import("../pages/OrderSuccess"));
+const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
 
 const Spinner = lazy(() => import("../components/ui/loadingSpinner/Spinner"));
 
@@ -68,6 +69,7 @@ const AppRoutes = () => {
           <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
           <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
           <Route path="/product/:productId" element={<PageWrapper><ProductDetails /></PageWrapper>} />
+          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
 
           {/* Protected Routes */}
           <Route

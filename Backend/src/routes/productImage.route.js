@@ -11,7 +11,7 @@ const { adminCheck } = require("../middleware/adminCheck.middleware");
 router.get("/:productId", getProductImages);
 
 // Protected routes (admin only)
-router.post("/", authMiddleware,  createProductImage);
-router.delete("/:imageId", authMiddleware, deleteProductImage);
+router.post("/", authMiddleware, adminCheck,  createProductImage);
+router.delete("/:imageId", authMiddleware, adminCheck, deleteProductImage);
 
 module.exports = router;

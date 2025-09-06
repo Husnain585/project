@@ -18,20 +18,10 @@ Cart.init(
       allowNull: false,
       references: { model: User, key: "userId" },
     },
-    productId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: { model: Product, key: "productId" },
-    },
      status: {
       type: DataTypes.ENUM("active", "completed"),
       allowNull: false,
       defaultValue: "active",
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1,
-      allowNull: false,
     },
   },
   {

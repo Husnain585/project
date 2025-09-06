@@ -14,8 +14,8 @@ router.get("/", getAllProducts);
 router.get("/:productId", getProductById);
 
 // Protected routes (admin)
-router.post("/", authMiddleware, createProduct);
-router.put("/:productId", authMiddleware, updateProduct);
-router.delete("/:productId", authMiddleware, deleteProduct);
+router.post("/", authMiddleware, adminCheck, createProduct);
+router.put("/:productId", authMiddleware, adminCheck, updateProduct);
+router.delete("/:productId", authMiddleware, adminCheck, deleteProduct);
 
 module.exports = router;

@@ -58,7 +58,7 @@ const addToCart = async (req, res) => {
     } else {
       cartItem = await CartItem.create({
         cartId: cart.cartId,
-        productId,
+        productId:  productId,
         quantity,
       });
     }
@@ -80,7 +80,7 @@ const addToCart = async (req, res) => {
     });
   } catch (error) {
     console.error("Add To Cart Error:", error);
-    return res.status(500).json({ error: "Server error" ,details: error.message});
+    return res.status(500).json({ error: "Server error" , details: error.message});
   }
 };
 

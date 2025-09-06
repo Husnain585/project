@@ -25,7 +25,7 @@ module.exports = {
       // Find user by username
       const user = await User.findOne({
         paranoid: false,
-        attributes: ["userId", "name", "username", "email", "password"],
+        attributes: ["userId", "name", "username", "email", "password", "role"],
 
         where: {
           ...{ username: username },
@@ -37,7 +37,11 @@ module.exports = {
         return res.status(401).json({ error: "Password Invalid credentials" });
 
       // Minimal JWT payload
-      const payload = { userId: user.userId, username: user.username };
+      const payload = {
+        userId: user.userId,
+        username: user.username,
+        role: user.role, 
+      };
       const token = sign(payload, process.env.SECRET, { expiresIn: "15m" });
 
       // Set secure cookie
@@ -96,11 +100,9 @@ module.exports = {
       if (role === "admin") {
         const existingAdmin = await User.findOne({ where: { role: "admin" } });
         if (existingAdmin) {
-          return res
-            .status(403)
-            .json({
-              error: "An admin already exists. Only one admin is allowed.",
-            });
+          return res.status(403).json({
+            error: "An admin already exists. Only one admin is allowed.",
+          });
         }
       }
 
