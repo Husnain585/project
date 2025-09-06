@@ -52,17 +52,17 @@ const Header = () => {
           : "bg-white/90 dark:bg-gray-900/80 backdrop-blur-md"
       } border-b border-gray-200 dark:border-gray-800 fixed top-0 z-50`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-7xl">
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-7xl">
         <div className="flex h-14 sm:h-16 lg:h-20 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 bg-gray-900 dark:bg-gray-50 rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
               <span className="text-white dark:text-gray-900 font-bold text-base sm:text-lg lg:text-xl">
-                S
+                H
               </span>
             </div>
             <span className="font-bold text-lg sm:text-xl lg:text-2xl text-gray-900 dark:text-gray-100">
-              Sera UI
+              MyShop
             </span>
           </Link>
 

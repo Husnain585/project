@@ -4,7 +4,6 @@ const { compare, hash } = require("bcryptjs");
 const { sign } = require("jsonwebtoken");
 const { Op } = require("sequelize");
 
-
 module.exports = {
   Login: async (req, res) => {
     try {
@@ -53,7 +52,9 @@ module.exports = {
       return res.status(200).json({ message: "Login successful", token });
     } catch (error) {
       console.error("Login Error:", error);
-      return res.status(500).json({ error: "Server error", details: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", details: error.message });
     }
   },
   Logout: async (req, res) => {
@@ -70,58 +71,69 @@ module.exports = {
     }
   },
   Register: async (req, res) => {
-  try {
-    const { name, username, email, password } = req.body;
+    try {
+      const { name, username, email, password, role } = req.body;
 
-    if (!name || !username || !email || !password) {
-      return res.status(400).json({ error: "All fields are required" });
+      if (!name || !username || !email || !password) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+
+      const usernameInput = username.trim();
+      const emailInput = email.trim().toLowerCase();
+
+      // Check if username or email already exists
+      const existingUser = await User.findOne({
+        where: {
+          [Op.or]: [{ username: usernameInput }, { email: emailInput }],
+        },
+      });
+
+      if (existingUser) {
+        return res
+          .status(409)
+          .json({ error: "Username or email already taken" });
+      }
+      if (role === "admin") {
+        const existingAdmin = await User.findOne({ where: { role: "admin" } });
+        if (existingAdmin) {
+          return res
+            .status(403)
+            .json({
+              error: "An admin already exists. Only one admin is allowed.",
+            });
+        }
+      }
+
+      // Hash password
+      const hashedPassword = await hash(password, 10);
+
+      // Create new user
+      const newUser = await User.create({
+        name,
+        username: usernameInput,
+        email: emailInput,
+        password: hashedPassword,
+        role: role && ["admin", "customer"].includes(role) ? role : "customer",
+      });
+
+      // JWT payload
+      const payload = { userId: newUser.userId, username: newUser.username };
+      const token = sign(payload, process.env.SECRET, { expiresIn: "5m" });
+
+      // Set cookie
+      res.cookie("auth", token, {
+        maxAge: 5 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
+
+      return res
+        .status(201)
+        .json({ message: "Registration successful", token });
+    } catch (error) {
+      console.error("Register Error:", error);
+      return res.status(500).json({ error: "Server error" });
     }
-
-    const usernameInput = username.trim();
-    const emailInput = email.trim().toLowerCase();
-
-    // Check if username or email already exists
-    const existingUser = await User.findOne({
-      where: {
-        [Op.or]: [
-          { username: usernameInput },
-          { email: emailInput }
-        ]
-      },
-    });
-
-    if (existingUser) {
-      return res.status(409).json({ error: "Username or email already taken" });
-    }
-
-    // Hash password
-    const hashedPassword = await hash(password, 10);
-
-    // Create new user
-    const newUser = await User.create({
-      name,
-      username: usernameInput,
-      email: emailInput,
-      password: hashedPassword,
-    });
-
-    // JWT payload
-    const payload = { userId: newUser.userId, username: newUser.username };
-    const token = sign(payload, process.env.SECRET, { expiresIn: "5m" });
-
-    // Set cookie
-    res.cookie("auth", token, {
-      maxAge: 5 * 60 * 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-    });
-
-    return res.status(201).json({ message: "Registration successful", token });
-  } catch (error) {
-    console.error("Register Error:", error);
-    return res.status(500).json({ error: "Server error" });
-  }
-},
-
+  },
 };
