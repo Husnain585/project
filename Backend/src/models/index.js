@@ -15,6 +15,7 @@ const Address = require("./address");
 const Payment = require("./payment");
 const CartItem = require("./cartItem");
 const emailCheck = require("./emailCheck");
+const OAuthAccount = require("./oAuthAccounts");
 
 // Attach models
 const models = {
@@ -31,7 +32,8 @@ const models = {
   Address,
   Payment,
   CartItem,
-  emailCheck
+  emailCheck,
+  OAuthAccount
 };
   // ===== Relations =====
 
@@ -91,6 +93,9 @@ CartItem.belongsTo(Product, { foreignKey: "productId" });
 User.hasOne(emailCheck, { foreignKey: "userId", as: "emailCheck" });
 emailCheck.belongsTo(User, { foreignKey: "userId", as: "user" });
 
+// Users ↔ OAuthAccounts (one-to-many)
+User.hasMany(OAuthAccount, { foreignKey: "userId", as: "oauthAccounts" });
+OAuthAccount.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 // Build db object
 const db = {};

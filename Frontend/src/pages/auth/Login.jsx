@@ -129,7 +129,8 @@ export default function Login() {
     return errs;
   };
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -185,15 +186,22 @@ export default function Login() {
 
         {/* Social login buttons */}
         <div className="grid grid-cols-3 gap-2">
-          <button className="flex items-center justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
-            <AppleIcon />
-          </button>
-          <button className="flex items-center justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
-            <GoogleIcon />
-          </button>
-          <button className="flex items-center justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
-            <GithubIcon />
-          </button>
+          <Link to="/apple">
+            {" "}
+            <button className="flex items-center cursor-pointer justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
+              <AppleIcon />
+            </button>
+          </Link>
+          <Link to="/google">
+            <button className="flex items-center cursor-pointer justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
+              <GoogleIcon />
+            </button>
+          </Link>
+          <Link to="/github">
+            <button className="flex items-center cursor-pointer justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
+              <GithubIcon />
+            </button>
+          </Link>
         </div>
 
         {/* OR divider */}
@@ -202,7 +210,9 @@ export default function Login() {
             <span className="w-full border-t border-gray-200" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-gray-500">Or continue with</span>
+            <span className="bg-white px-2 text-gray-500">
+              Or continue with
+            </span>
           </div>
         </div>
 
@@ -220,7 +230,10 @@ export default function Login() {
 
         {showForgotPassword && (
           <div className="text-right mb-2">
-            <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
               Forgot Password?
             </Link>
           </div>
@@ -229,7 +242,12 @@ export default function Login() {
         {/* Form */}
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium text-gray-900">Username</label>
+            <label
+              htmlFor="username"
+              className="text-sm font-medium text-gray-900"
+            >
+              Username
+            </label>
             <input
               type="text"
               name="username"
@@ -239,11 +257,18 @@ export default function Login() {
               placeholder="Enter your username"
               className="flex h-9 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400"
             />
-            {errors.username && <p className="text-red-600 text-xs mt-1">{errors.username}</p>}
+            {errors.username && (
+              <p className="text-red-600 text-xs mt-1">{errors.username}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-gray-900">Password</label>
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-gray-900"
+            >
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -262,7 +287,9 @@ export default function Login() {
                 {showPassword ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </div>
-            {errors.password && <p className="text-red-600 text-xs mt-1">{errors.password}</p>}
+            {errors.password && (
+              <p className="text-red-600 text-xs mt-1">{errors.password}</p>
+            )}
           </div>
 
           <button
@@ -276,10 +303,11 @@ export default function Login() {
 
         <p className="mt-6 text-sm text-center text-gray-600">
           Don’t have an account?{" "}
-          <Link to="/register" className="text-blue-600 font-medium">Register</Link>
+          <Link to="/register" className="text-blue-600 font-medium">
+            Register
+          </Link>
         </p>
       </div>
     </div>
   );
 }
-
