@@ -1,13 +1,17 @@
 const routes = require("express").Router();
 const {
   sendVerificationEmail,
-  verifyEmail,
+  verifyEmailCode,
+  verifyEmailLink,
 } = require("../controller/emailCheck.controller");
 
-// Send email (call after register)
+// Send email (after register)
 routes.post("/send-verification", sendVerificationEmail);
 
-// Verify link
-routes.get("/verify-email/:token", verifyEmail);
+// Verify via OTP code
+routes.post("/verify-email", verifyEmailCode);
+
+// Verify via clickable link
+routes.get("/verify-email/:token", verifyEmailLink);
 
 module.exports = routes;

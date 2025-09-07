@@ -22,7 +22,7 @@ module.exports = {
       const user = await User.findOne({
         paranoid: false,
         attributes: ["userId", "name", "username", "email", "password", "role"],
-        where: { username: username.trim() },
+        where: { username: username },
       });
 
       if (!user) return res.status(401).json({ error: "User not found" });
