@@ -228,25 +228,27 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errs = { ...validateStep() };
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+  e.preventDefault();
+  const errs = { ...validateStep() };
+  setErrors(errs);
+  if (Object.keys(errs).length > 0) return;
 
-    try {
-      setIsLoading(true);
-      const res = await axios.post(`${config.apiBaseUrl}/auth/register`, form);
-      if (res.data?.token) {
-        setToken(res.data.token);
-        setUser(res.data.user);
-        navigate("/");
-      }
-    } catch (err) {
-      setErrors({ api: err.response?.data?.error || "Registration failed" });
-    } finally {
-      setIsLoading(false);
+  try {
+    setIsLoading(true);
+    const res = await axios.post(`${config.apiBaseUrl}/auth/register`, form);
+
+    if (res.data?.message) {
+      // ✅ show message and redirect to "Check your email" page
+      alert(res.data.message);
+      navigate("/check-email"); 
     }
-  };
+  } catch (err) {
+    setErrors({ api: err.response?.data?.error || "Registration failed" });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   // --- Styles Injection ---
   useEffect(() => {

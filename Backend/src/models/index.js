@@ -14,6 +14,7 @@ const Wishlist = require("./wishlist");
 const Address = require("./address");
 const Payment = require("./payment");
 const CartItem = require("./cartItem");
+const emailCheck = require("./emailCheck");
 
 // Attach models
 const models = {
@@ -30,6 +31,7 @@ const models = {
   Address,
   Payment,
   CartItem,
+  emailCheck
 };
   // ===== Relations =====
 
@@ -84,6 +86,10 @@ CartItem.belongsTo(Cart, { foreignKey: "cartId" });
 
 Product.hasMany(CartItem, { foreignKey: "productId" });
 CartItem.belongsTo(Product, { foreignKey: "productId" });
+
+// Verify Email
+User.hasOne(emailCheck, { foreignKey: "userId", as: "emailCheck" });
+emailCheck.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 
 // Build db object
