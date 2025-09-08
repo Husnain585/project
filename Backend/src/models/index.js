@@ -33,9 +33,9 @@ const models = {
   Payment,
   CartItem,
   emailCheck,
-  OAuthAccount
+  OAuthAccount,
 };
-  // ===== Relations =====
+// ===== Relations =====
 
 // Users ↔ Cart (one-to-many)
 User.hasMany(Cart, { foreignKey: "userId", as: "carts" });

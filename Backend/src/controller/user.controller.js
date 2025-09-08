@@ -10,8 +10,9 @@ module.exports = {
         attributes: { exclude: ["password"] },
         include: [
           {
-            model: OAuthAccount, // must be the same instance registered in associations
-            attributes: ["provider", "providerId", "accessToken", "expiresAt"],
+            model: OAuthAccount,
+            as: "oauthAccounts",
+            attributes: ["provider", "providerUserId"],
           },
         ],
       });
