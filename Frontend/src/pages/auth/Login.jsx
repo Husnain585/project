@@ -128,9 +128,7 @@ export default function Login() {
 
         {/* Social login buttons */}
         <div className="grid grid-cols-3 gap-2">
-          <button onClick={() => handleOAuthLogin("apple")} className="flex items-center justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
-            <AppleIcon />
-          </button>
+          
           <button onClick={() => handleOAuthLogin("google")} className="flex items-center justify-center h-9 px-3 rounded-md border border-gray-200 bg-white hover:bg-gray-50 transition">
             <GoogleIcon />
           </button>

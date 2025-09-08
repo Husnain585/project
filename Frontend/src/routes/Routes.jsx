@@ -22,7 +22,8 @@ const Contact = lazy(() => import("../pages/Contact"));
 const Checkout = lazy(() => import("../pages/Checkout"));
 const OrderSuccess = lazy(() => import("../pages/OrderSuccess"));
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
-const GoogleLoginPage = lazy(() => import("../pages/GoogleLoginPage"));
+const GoogleLoginPage = lazy(() => import("../pages/auth/GoogleLoginPage"));
+const GithubLoginPage = lazy(() => import("../pages/auth/GithubLoginPage"));
 
 const Spinner = lazy(() => import("../components/ui/loadingSpinner/Spinner"));
 
@@ -70,6 +71,7 @@ const AppRoutes = () => {
           <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
           <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
           <Route path="/google" element={<PageWrapper><GoogleLoginPage /></PageWrapper>} />
+          <Route path="/github" element={<PageWrapper><GithubLoginPage /></PageWrapper>} />
           <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
           <Route path="/check-email" element={<PageWrapper><CheckEmail /></PageWrapper>} />
           <Route path="/product/:productId" element={<PageWrapper><ProductDetails /></PageWrapper>} />

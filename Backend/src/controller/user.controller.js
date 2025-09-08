@@ -1,6 +1,6 @@
 const User = require("../models/users");
 const { compare, hash } = require("bcryptjs");
-const { OAuthAccount } = require("../models/oAuthAccounts");
+const OAuthAccount  = require("../models/oAuthAccounts");
 
 module.exports = {
   getProfile: async (req, res) => {

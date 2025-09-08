@@ -7,13 +7,14 @@ import { motion } from "framer-motion";
 import axios from "axios";
 
 const Header = () => {
-  const { user, setUser, token, setToken, cartCount, wishlistCount, fetchUser } =
+  const { user, setUser, token, setToken, cartCount, wishlistCount } =
     useContext(GlobalContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // Logout function
   const handleLogout = async () => {
     try {
       await axios.post(
@@ -29,27 +30,30 @@ const Header = () => {
     navigate("/login");
   };
 
-  // Fetch user from backend JWT cookie if token is missing
-  useEffect(() => {
-    const fetchUserFromCookie = async () => {
-      if (token || user) return; // already have user
-      try {
-        const res = await axios.get("http://localhost:3000/api/auth/me", {
-          withCredentials: true,
-        });
-        if (res.data) setUser(res.data.user || { username: res.data.email });
-      } catch (err) {
-        console.error("Failed to fetch user from cookie:", err);
+  // Fetch user info from backend
+  const fetchUserInfo = async () => {
+    if (user) return; // Already have user
+    try {
+      const res = await axios.get("http://localhost:3000/api/auth/me", {
+        withCredentials: true,
+      });
+      if (res.data?.user) {
+        setUser(res.data.user);
+      } else if (res.data?.email) {
+        setUser({ username: res.data.email });
       }
-    };
-    fetchUserFromCookie();
-  }, [token, user, setUser]);
+    } catch (err) {
+      console.error("Failed to fetch user info:", err);
+    }
+  };
 
-  // Scroll effect for background
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
+    fetchUserInfo();
+  }, [token, user]);
+
+  // Scroll effect
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -108,7 +112,7 @@ const Header = () => {
 
           {/* Desktop Auth / Buttons / Theme */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-6">
-            {/* Theme Toggle Button */}
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
@@ -137,7 +141,7 @@ const Header = () => {
                   to="/profile"
                   className="text-sm font-medium text-gray-700 hover:text-blue-600"
                 >
-                  Hi, {user?.username || "User"}
+                  Hi, {user?.username || user?.name || "User"}
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -253,21 +257,22 @@ const Header = () => {
                   </Link>
                 </>
               ) : (
-                <>
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-                  >
-                    Hi, {user?.username || "User"}
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 py-2.5 text-sm text-red-500 hover:underline rounded-md"
-                  >
-                    Logout
-                  </button>
-                </>
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  Hi, {user?.username || user?.name || "User"}
+                </Link>
+              )}
+
+              {token && user && (
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-2.5 text-sm text-red-500 hover:underline rounded-md"
+                >
+                  Logout
+                </button>
               )}
             </div>
           </div>

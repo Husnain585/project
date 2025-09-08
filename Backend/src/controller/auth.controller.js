@@ -1,4 +1,3 @@
-// controllers/auth.controller.js
 require("dotenv").config();
 
 const User = require("../models/users");
@@ -8,24 +7,20 @@ const { Op } = require("sequelize");
 const { models } = require("../models/index");
 const { sendVerificationEmail } = require("./emailCheck.controller");
 const { emailCheck } = models;
-const { OAuthAccount } = models;
-const {handleOAuthLogin} = require("../services/oauth.service")
+const { handleOAuthLogin } = require("../services/oauth.service");
+const { handleGithubLogin } = require("../services/github.oauth.service");
 
-// Arctic (single import)
 const {
   generateState,
   generateCodeVerifier,
   decodeIdToken,
-  OAuth2RequestError,
-  ArcticFetchError,
 } = require("arctic");
 
-// IMPORTANT: export from config/oauth/google should be the client instance:
-// module.exports = new Google(...)
-// so require it directly:
+// OAuth clients
 const google = require("../config/oauth/google");
+const github = require("../config/oauth/github");
 
-// Optional: use google-auth-library to VERIFY id tokens (recommended in prod)
+// Google ID token verification
 let verifyIdTokenWithGoogle;
 try {
   const { OAuth2Client } = require("google-auth-library");
@@ -38,20 +33,17 @@ try {
     });
     return ticket.getPayload();
   };
-} catch (e) {
-  // library not installed or configured — fallback to decodeIdToken (no signature verification)
+} catch {
   verifyIdTokenWithGoogle = async (idToken) =>
     idToken ? decodeIdToken(idToken) : null;
 }
 
-// Config
 const OAUTH_EXCHANGE_EXPIRY_MS = parseInt(
   process.env.OAUTH_EXCHANGE_EXPIRY_MS || "900000",
   10
-); // 15 minutes
+);
 const IS_PROD = process.env.NODE_ENV === "production";
 
-// Helper: safe cookie options
 const oauthCookieOptions = {
   httpOnly: true,
   secure: IS_PROD,
@@ -65,10 +57,11 @@ module.exports = {
   Login: async (req, res) => {
     try {
       const { username, password } = req.body;
-      if (!username || !password)
+      if (!username || !password) {
         return res
           .status(400)
           .json({ error: "Username and password are required" });
+      }
 
       const user = await User.findOne({
         paranoid: false,
@@ -79,19 +72,17 @@ module.exports = {
       if (!user) return res.status(401).json({ error: "User not found" });
 
       const isValid = await compare(password.trim(), user.password);
-      if (!isValid)
-        return res.status(401).json({ error: "Invalid credentials" });
+      if (!isValid) return res.status(401).json({ error: "Invalid credentials" });
 
-      // Check email verification
       const emailRecord = await emailCheck.findOne({
         where: { userId: user.userId },
       });
-      if (!emailRecord || !emailRecord.isVerified)
+      if (!emailRecord || !emailRecord.isVerified) {
         return res
           .status(403)
           .json({ error: "Please verify your email before login" });
+      }
 
-      // JWT payload
       const payload = {
         userId: user.userId,
         username: user.username,
@@ -99,7 +90,6 @@ module.exports = {
       };
       const token = sign(payload, process.env.SECRET, { expiresIn: "15m" });
 
-      // Set cookie (maxAge in ms)
       res.cookie("auth", token, {
         maxAge: 15 * 60 * 1000,
         httpOnly: true,
@@ -120,7 +110,6 @@ module.exports = {
   // ---------------- LOGOUT ----------------
   Logout: async (req, res) => {
     try {
-      // Clear cookie using matching path/options
       res.clearCookie("auth", {
         httpOnly: true,
         secure: IS_PROD,
@@ -138,34 +127,33 @@ module.exports = {
   Register: async (req, res) => {
     try {
       const { name, username, email, password, role } = req.body;
-      if (!name || !username || !email || !password)
+      if (!name || !username || !email || !password) {
         return res.status(400).json({ error: "All fields are required" });
+      }
 
       const usernameInput = username.trim();
       const emailInput = email.trim().toLowerCase();
 
-      // Check if user/email exists
       const existingUser = await User.findOne({
         where: {
           [Op.or]: [{ username: usernameInput }, { email: emailInput }],
         },
       });
-      if (existingUser)
+      if (existingUser) {
         return res
           .status(409)
           .json({ error: "Username or email already taken" });
-
-      // Optional: allow only one admin
-      if (role === "admin") {
-        const existingAdmin = await User.findOne({ where: { role: "admin" } });
-        if (existingAdmin)
-          return res.status(403).json({ error: "Only one admin is allowed" });
       }
 
-      // Hash password (10 rounds)
+      if (role === "admin") {
+        const existingAdmin = await User.findOne({ where: { role: "admin" } });
+        if (existingAdmin) {
+          return res.status(403).json({ error: "Only one admin is allowed" });
+        }
+      }
+
       const hashedPassword = await hash(password, 10);
 
-      // Create user
       const newUser = await User.create({
         name,
         username: usernameInput,
@@ -174,23 +162,7 @@ module.exports = {
         role: role && ["admin", "customer"].includes(role) ? role : "customer",
       });
 
-      // Option: do not auto-login before verification. If you still want to, keep this block.
-      if (process.env.AUTO_LOGIN_ON_REGISTER === "true") {
-        const payload = { userId: newUser.userId, username: newUser.username };
-        const token = sign(payload, process.env.SECRET, { expiresIn: "5m" });
-        res.cookie("auth", token, {
-          maxAge: 5 * 60 * 1000,
-          httpOnly: true,
-          secure: IS_PROD,
-          sameSite: "Lax",
-          path: "/",
-        });
-      }
-
-      // Send verification email (wrap call w/ try/catch so register still returns 201)
       try {
-        // You currently call the controller function with fake req/res. That's okay,
-        // but consider refactoring email sending into a separate service function.
         await sendVerificationEmail(
           { body: { userId: newUser.userId } },
           {
@@ -201,7 +173,6 @@ module.exports = {
         );
       } catch (sendErr) {
         console.error("Failed to send verification email:", sendErr);
-        // Do not fail the whole registration just because email failed, but inform client.
       }
 
       return res.status(201).json({
@@ -216,78 +187,156 @@ module.exports = {
   },
 
   // ---------------- LOGIN WITH GOOGLE ----------------
-LoginWithGoogle: async (req, res) => {
-  try {
-    if (req.user) {
-      return res.redirect("/");
+  LoginWithGoogle: async (req, res) => {
+    try {
+      const state = generateState();
+      const codeVerifier = generateCodeVerifier();
+      const scopes = ["openid", "profile", "email"];
+
+      const url = google.createAuthorizationURL(state, codeVerifier, scopes);
+      url.searchParams.set("access_type", "offline");
+      url.searchParams.set("prompt", "consent");
+
+      res.cookie("google_oauth_state", state, oauthCookieOptions);
+      res.cookie("google_code_verifier", codeVerifier, oauthCookieOptions);
+
+      return res.redirect(url.toString());
+    } catch (err) {
+      console.error("LoginWithGoogle error:", err);
+      return res.status(500).send("Internal server error");
     }
+  },
 
-    const state = generateState();
-    const codeVerifier = generateCodeVerifier();
-    const scopes = ["openid", "profile", "email"];
+  // ---------------- GOOGLE CALLBACK ----------------
+  googleCallback: async (req, res) => {
+    try {
+      const { code, state } = req.query;
+      const storedState = req.cookies?.google_oauth_state;
+      const codeVerifier = req.cookies?.google_code_verifier;
 
-    const url = google.createAuthorizationURL(state, codeVerifier, scopes);
-    url.searchParams.set("access_type", "offline");
-    url.searchParams.set("prompt", "consent");
+      if (!code) return res.status(400).send("Missing authorization code.");
+      if (!state || state !== storedState)
+        return res.status(400).send("Invalid state.");
+      if (!codeVerifier) return res.status(400).send("Missing code verifier.");
 
-    res.cookie("google_oauth_state", state, oauthCookieOptions);
-    res.cookie("google_code_verifier", codeVerifier, oauthCookieOptions);
+      const tokens = await google.validateAuthorizationCode(code, codeVerifier);
+      const idToken = tokens.idToken?.() || null;
+      const claims = idToken ? await verifyIdTokenWithGoogle(idToken) : null;
 
-    return res.redirect(url.toString());
-  } catch (err) {
-    console.error("LoginWithGoogle error:", err);
-    return res.status(500).send("Internal server error");
-  }
-},
+      if (!claims) return res.status(400).send("Unable to verify Google ID token");
 
+      const user = await handleOAuthLogin("google", claims, {
+        accessToken: tokens.accessToken?.(),
+        refreshToken: tokens.refreshToken?.() || null,
+        expiresAt: tokens.accessTokenExpiresAt?.()
+          ? new Date(tokens.accessTokenExpiresAt())
+          : null,
+      });
 
-// ---------------- GOOGLE CALLBACK ----------------
-googleCallback: async (req, res) => {
-  try {
-    const { code, state } = req.query;
-    const storedState = req.cookies?.google_oauth_state;
-    const codeVerifier = req.cookies?.google_code_verifier;
+      res.clearCookie("google_oauth_state", oauthCookieOptions);
+      res.clearCookie("google_code_verifier", oauthCookieOptions);
 
-    if (!code) return res.status(400).send("Missing authorization code.");
-    if (!state || state !== storedState) return res.status(400).send("Invalid state.");
-    if (!codeVerifier) return res.status(400).send("Missing code verifier.");
+      const payload = {
+        userId: user.userId,
+        username: user.username,
+        role: user.role,
+      };
+      const jwt = sign(payload, process.env.SECRET, { expiresIn: "60m" });
 
-    const tokens = await google.validateAuthorizationCode(code, codeVerifier);
-    const idToken = tokens.idToken?.() || null;
-    const claims = idToken ? await verifyIdTokenWithGoogle(idToken) : null;
+      res.cookie("auth", jwt, {
+        maxAge: 60 * 60 * 1000,
+        httpOnly: true,
+        secure: IS_PROD,
+        sameSite: "Lax",
+        path: "/",
+      });
 
-    if (!claims) return res.status(400).send("Unable to verify Google ID token");
+      const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
+      return res.redirect(FRONTEND_URL);
+    } catch (err) {
+      console.error("googleCallback error:", err);
+      return res.status(500).send("Internal server error");
+    }
+  },
 
-    // ✅ Use service function
-    const user = await handleOAuthLogin("google", claims, {
-      accessToken: tokens.accessToken?.(),
-      refreshToken: tokens.refreshToken?.() || null,
-      expiresAt: tokens.accessTokenExpiresAt?.()
-        ? new Date(tokens.accessTokenExpiresAt())
-        : null,
-    });
+  // ---------------- LOGIN WITH GITHUB ----------------
+  LoginWithGithub: async (req, res) => {
+    try {
+      const state = generateState();
+      const scopes = ["user:email"];
 
-    res.clearCookie("google_oauth_state", oauthCookieOptions);
-    res.clearCookie("google_code_verifier", oauthCookieOptions);
+      // ❌ NO codeVerifier here (GitHub doesn’t support PKCE with Arctic)
+      const url = github.createAuthorizationURL(state, scopes);
 
-    // Issue JWT
-    const payload = { userId: user.userId, username: user.username, role: user.role };
-    const jwt = sign(payload, process.env.SECRET, { expiresIn: "60m" });
+      res.cookie("github_oauth_state", state, oauthCookieOptions);
 
-    res.cookie("auth", jwt, {
-      maxAge: 60 * 60 * 1000,
-      httpOnly: true,
-      secure: IS_PROD,
-      sameSite: "Lax",
-      path: "/",
-    });
+      return res.redirect(url.toString());
+    } catch (err) {
+      console.error("LoginWithGithub error:", err);
+      return res.status(500).send("Internal server error");
+    }
+  },
 
-    const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
-    return res.redirect(FRONTEND_URL);
-  } catch (err) {
-    console.error("googleCallback error:", err);
-    return res.status(500).send("Internal server error");
-  }
-},
+  // ---------------- GITHUB CALLBACK ----------------
+  githubCallback: async (req, res) => {
+    try {
+      const { code, state } = req.query;
+      const storedState = req.cookies?.github_oauth_state;
 
+      if (!code) return res.status(400).send("Missing authorization code.");
+      if (!state || state !== storedState)
+        return res.status(400).send("Invalid state.");
+
+      const tokens = await github.validateAuthorizationCode(code);
+      const accessToken = tokens.accessToken?.();
+
+      const profileResponse = await fetch("https://api.github.com/user", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const profile = await profileResponse.json();
+
+      if (!profile.email) {
+        const emailResponse = await fetch(
+          "https://api.github.com/user/emails",
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const emails = await emailResponse.json();
+        const primaryEmail = emails.find((e) => e.primary && e.verified);
+        if (primaryEmail) profile.email = primaryEmail.email;
+      }
+
+      if (!profile.email) {
+        return res.status(400).send("Unable to fetch GitHub email");
+      }
+
+      const user = await handleGithubLogin(profile, {
+        accessToken,
+        refreshToken: null,
+        expiresAt: null,
+      });
+
+      res.clearCookie("github_oauth_state", oauthCookieOptions);
+
+      const payload = {
+        userId: user.userId,
+        username: user.username,
+        role: user.role,
+      };
+      const jwt = sign(payload, process.env.SECRET, { expiresIn: "60m" });
+
+      res.cookie("auth", jwt, {
+        maxAge: 60 * 60 * 1000,
+        httpOnly: true,
+        secure: IS_PROD,
+        sameSite: "Lax",
+        path: "/",
+      });
+
+      const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
+      return res.redirect(FRONTEND_URL);
+    } catch (err) {
+      console.error("githubCallback error:", err);
+      return res.status(500).send("Internal server error");
+    }
+  },
 };
