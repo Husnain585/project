@@ -1,11 +1,10 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
-const { v4: uuid } = require("uuid");
 
 class User extends Model {
   toJSON() {
     const values = { ...this.get() };
-    delete values.password;
+    delete values.password; // hide password when serializing
     return values;
   }
 }
@@ -18,27 +17,28 @@ User.init(
       defaultValue: DataTypes.UUIDV4,
     },
     name: {
-      type: DataTypes.STRING(60),
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
     username: {
-      type: DataTypes.STRING(60),
+      type: DataTypes.STRING(100),
       unique: true,
       allowNull: false,
     },
     password: {
       type: DataTypes.STRING(1000),
-      allowNull: false,
+      allowNull: true, // <-- allow NULL for OAuth users
     },
     email: {
-      type: DataTypes.STRING(60),
+      type: DataTypes.STRING(100),
       allowNull: false,
+      unique: true, // <-- enforce one user per email
       validate: { isEmail: true },
     },
     role: {
       type: DataTypes.ENUM("customer", "admin"),
       allowNull: false,
-      defaultValue: "customer", 
+      defaultValue: "customer",
     },
   },
   {
@@ -46,7 +46,7 @@ User.init(
     modelName: "User",
     tableName: "users",
     timestamps: true,
-    paranoid: true,
+    paranoid: true, // soft delete
   }
 );
 

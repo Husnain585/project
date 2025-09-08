@@ -9,6 +9,7 @@ const { models } = require("../models/index");
 const { sendVerificationEmail } = require("./emailCheck.controller");
 const { emailCheck } = models;
 const { OAuthAccount } = models;
+const {handleOAuthLogin} = require("../services/oauth.service")
 
 // Arctic (single import)
 const {
@@ -78,14 +79,17 @@ module.exports = {
       if (!user) return res.status(401).json({ error: "User not found" });
 
       const isValid = await compare(password.trim(), user.password);
-      if (!isValid) return res.status(401).json({ error: "Invalid credentials" });
+      if (!isValid)
+        return res.status(401).json({ error: "Invalid credentials" });
 
       // Check email verification
       const emailRecord = await emailCheck.findOne({
         where: { userId: user.userId },
       });
       if (!emailRecord || !emailRecord.isVerified)
-        return res.status(403).json({ error: "Please verify your email before login" });
+        return res
+          .status(403)
+          .json({ error: "Please verify your email before login" });
 
       // JWT payload
       const payload = {
@@ -107,7 +111,9 @@ module.exports = {
       return res.status(200).json({ message: "Login successful", token });
     } catch (error) {
       console.error("Login Error:", error);
-      return res.status(500).json({ error: "Server error", details: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", details: error.message });
     }
   },
 
@@ -145,12 +151,15 @@ module.exports = {
         },
       });
       if (existingUser)
-        return res.status(409).json({ error: "Username or email already taken" });
+        return res
+          .status(409)
+          .json({ error: "Username or email already taken" });
 
       // Optional: allow only one admin
       if (role === "admin") {
         const existingAdmin = await User.findOne({ where: { role: "admin" } });
-        if (existingAdmin) return res.status(403).json({ error: "Only one admin is allowed" });
+        if (existingAdmin)
+          return res.status(403).json({ error: "Only one admin is allowed" });
       }
 
       // Hash password (10 rounds)
@@ -185,7 +194,8 @@ module.exports = {
         await sendVerificationEmail(
           { body: { userId: newUser.userId } },
           {
-            json: (data) => console.log("sendVerificationEmail response:", data),
+            json: (data) =>
+              console.log("sendVerificationEmail response:", data),
             status: (code) => ({ json: (data) => console.log(code, data) }),
           }
         );
@@ -199,40 +209,39 @@ module.exports = {
       });
     } catch (error) {
       console.error("Register Error:", error);
-      return res.status(500).json({ error: "Server error", details: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", details: error.message });
     }
   },
 
   // ---------------- LOGIN WITH GOOGLE ----------------
-  LoginWithGoogle: async (req, res) => {
-    try {
-      // If user is already logged in, don't start the flow
-      if (req.user) return res.redirect("/");
-
-      const state = generateState();
-      const codeVerifier = generateCodeVerifier();
-
-      const scopes = ["openid", "profile", "email"];
-      const url =  google.createAuthorizationURL(state, codeVerifier, scopes);
-
-      // Request refresh token if needed
-      url.searchParams.set("access_type", "offline");
-      url.searchParams.set("prompt", "consent"); // optional: to ensure refresh token on repeated login
-
-      // Store state + code_verifier in httpOnly cookies
-      res.cookie("google_oauth_state", state, oauthCookieOptions);
-      res.cookie("google_code_verifier", codeVerifier, oauthCookieOptions);
-
-      return res.redirect(url.toString());
-    } catch (err) {
-      console.error("startGoogleOAuth error:", err);
-      return res.status(500).send("Internal server error");
+LoginWithGoogle: async (req, res) => {
+  try {
+    if (req.user) {
+      return res.redirect("/");
     }
-  },
 
-  // Callback route
-  
+    const state = generateState();
+    const codeVerifier = generateCodeVerifier();
+    const scopes = ["openid", "profile", "email"];
 
+    const url = google.createAuthorizationURL(state, codeVerifier, scopes);
+    url.searchParams.set("access_type", "offline");
+    url.searchParams.set("prompt", "consent");
+
+    res.cookie("google_oauth_state", state, oauthCookieOptions);
+    res.cookie("google_code_verifier", codeVerifier, oauthCookieOptions);
+
+    return res.redirect(url.toString());
+  } catch (err) {
+    console.error("LoginWithGoogle error:", err);
+    return res.status(500).send("Internal server error");
+  }
+},
+
+
+// ---------------- GOOGLE CALLBACK ----------------
 googleCallback: async (req, res) => {
   try {
     const { code, state } = req.query;
@@ -245,67 +254,26 @@ googleCallback: async (req, res) => {
 
     const tokens = await google.validateAuthorizationCode(code, codeVerifier);
     const idToken = tokens.idToken?.() || null;
-
     const claims = idToken ? await verifyIdTokenWithGoogle(idToken) : null;
-    const googleSub = claims?.sub;
-    const email = claims?.email;
 
-    if (!googleSub) return res.status(400).send("Google user ID missing.");
+    if (!claims) return res.status(400).send("Unable to verify Google ID token");
 
-    // Step 1: Check if an account exists with this providerId
-    let oauthAccount = await OAuthAccount.findOne({
-      where: { provider: "google", providerId: googleSub },
-      include: [{ model: User, as: "user" }],
-    });
-
-    let user;
-    if (oauthAccount) {
-      // existing OAuthAccount → grab user
-      user = oauthAccount.user;
-    } else {
-      // Step 2: Check if email already belongs to an existing user
-      user = await User.findOne({ where: { email } });
-
-      if (!user) {
-        // If not, create new user
-        user = await User.create({
-          name: claims?.name || "",
-          email,
-          username: email, // or generate unique username
-          password: "", // not needed for social login
-          role: "customer",
-        });
-      }
-
-      // Step 3: Create new OAuthAccount linked to user
-      oauthAccount = await OAuthAccount.create({
-        provider: "google",
-        providerId: googleSub,
-        accessToken: tokens.accessToken?.(),
-        refreshToken: tokens.refreshToken?.() || null,
-        expiresAt: tokens.accessTokenExpiresAt?.()
-          ? new Date(tokens.accessTokenExpiresAt())
-          : null,
-        userId: user.userId,
-      });
-    }
-
-    // Step 4: Update tokens
-    await oauthAccount.update({
+    // ✅ Use service function
+    const user = await handleOAuthLogin("google", claims, {
       accessToken: tokens.accessToken?.(),
-      refreshToken: tokens.refreshToken?.() || oauthAccount.refreshToken,
+      refreshToken: tokens.refreshToken?.() || null,
       expiresAt: tokens.accessTokenExpiresAt?.()
         ? new Date(tokens.accessTokenExpiresAt())
-        : oauthAccount.expiresAt,
+        : null,
     });
 
-    // Clear cookies
     res.clearCookie("google_oauth_state", oauthCookieOptions);
     res.clearCookie("google_code_verifier", oauthCookieOptions);
 
-    // Issue app JWT
-    const payload = { userId: user.userId, username: user.username || email, role: user.role };
+    // Issue JWT
+    const payload = { userId: user.userId, username: user.username, role: user.role };
     const jwt = sign(payload, process.env.SECRET, { expiresIn: "60m" });
+
     res.cookie("auth", jwt, {
       maxAge: 60 * 60 * 1000,
       httpOnly: true,
@@ -320,6 +288,6 @@ googleCallback: async (req, res) => {
     console.error("googleCallback error:", err);
     return res.status(500).send("Internal server error");
   }
-}
+},
 
 };

@@ -1,17 +1,22 @@
 const User = require("../models/users");
 const { compare, hash } = require("bcryptjs");
+const { OAuthAccount } = require("../models/oAuthAccounts");
 
 module.exports = {
   getProfile: async (req, res) => {
     try {
       const user = await User.findOne({
         where: { userId: req.user.userId },
-        attributes: { exclude: ["password"] }, // hide password
+        attributes: { exclude: ["password"] },
+        include: [
+          {
+            model: OAuthAccount, // must be the same instance registered in associations
+            attributes: ["provider", "providerId", "accessToken", "expiresAt"],
+          },
+        ],
       });
 
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
+      if (!user) return res.status(404).json({ error: "User not found" });
 
       return res.status(200).json({ user });
     } catch (error) {

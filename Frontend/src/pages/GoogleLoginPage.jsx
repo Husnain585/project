@@ -1,10 +1,17 @@
-// GoogleLoginPage.jsx
-import { useEffect } from "react";
+// src/pages/GoogleLoginPage.jsx
+import React, { useEffect } from "react";
 
-export default function GoogleLoginPage() {
+const GoogleLoginPage = () => {
   useEffect(() => {
-    window.location.href = "http://localhost:3000/api/auth/google"; // your backend route
+    // Redirect to backend Google OAuth
+    window.location.href = "http://localhost:3000/api/auth/google";
   }, []);
 
-  return <p>Redirecting to Google login...</p>;
-}
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
+      <p className="text-gray-700 dark:text-gray-200">Redirecting to Google...</p>
+    </div>
+  );
+};
+
+export default GoogleLoginPage;

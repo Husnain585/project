@@ -2,22 +2,48 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../../context/GlobalContext";
-import ThemeContext  from "../../context/ThemeContext.jsx"; // Import your ThemeContext
+import ThemeContext from "../../context/ThemeContext.jsx";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const Header = () => {
-  const { user, setUser, token, setToken, cartCount, wishlistCount } =
+  const { user, setUser, token, setToken, cartCount, wishlistCount, fetchUser } =
     useContext(GlobalContext);
-  const { theme, toggleTheme } = useContext(ThemeContext); // Get theme and toggle function
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:3000/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+    } catch (err) {
+      console.error(err);
+    }
     setToken(null);
     setUser(null);
     navigate("/login");
   };
+
+  // Fetch user from backend JWT cookie if token is missing
+  useEffect(() => {
+    const fetchUserFromCookie = async () => {
+      if (token || user) return; // already have user
+      try {
+        const res = await axios.get("http://localhost:3000/api/auth/me", {
+          withCredentials: true,
+        });
+        if (res.data) setUser(res.data.user || { username: res.data.email });
+      } catch (err) {
+        console.error("Failed to fetch user from cookie:", err);
+      }
+    };
+    fetchUserFromCookie();
+  }, [token, user, setUser]);
 
   // Scroll effect for background
   useEffect(() => {
@@ -90,12 +116,18 @@ const Header = () => {
               {theme === "light" ? "🌞" : "🌙"}
             </button>
 
-            {!token ? (
+            {!token && !user ? (
               <>
-                <Link to="/login" className="text-sm font-medium hover:text-blue-600">
+                <Link
+                  to="/login"
+                  className="text-sm font-medium hover:text-blue-600"
+                >
                   Login
                 </Link>
-                <Link to="/register" className="text-sm font-medium hover:text-blue-600">
+                <Link
+                  to="/register"
+                  className="text-sm font-medium hover:text-blue-600"
+                >
                   Register
                 </Link>
               </>
@@ -150,12 +182,24 @@ const Header = () => {
             aria-label="Toggle menu"
           >
             {isMenuOpen ? (
-              <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg
+                className="h-5 w-5 sm:h-6 sm:w-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             ) : (
-              <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg
+                className="h-5 w-5 sm:h-6 sm:w-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
                 <line x1="3" y1="12" x2="21" y2="12" />
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <line x1="3" y1="18" x2="21" y2="18" />
@@ -191,21 +235,36 @@ const Header = () => {
                 {theme === "light" ? "🌞 Light Mode" : "🌙 Dark Mode"}
               </button>
 
-              {!token ? (
+              {!token && !user ? (
                 <>
-                  <Link to="/login" onClick={() => setIsMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
                     Login
                   </Link>
-                  <Link to="/register" onClick={() => setIsMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
                     Register
                   </Link>
                 </>
               ) : (
                 <>
-                  <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
                     Hi, {user?.username || "User"}
                   </Link>
-                  <button onClick={handleLogout} className="px-3 py-2.5 text-sm text-red-500 hover:underline rounded-md">
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-2.5 text-sm text-red-500 hover:underline rounded-md"
+                  >
                     Logout
                   </button>
                 </>

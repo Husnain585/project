@@ -1,10 +1,9 @@
-// src/components/ProtectedRoute.jsx
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalContext";
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loadingUser } = useContext(GlobalContext);
+  const { user, loadingUser, token } = useContext(GlobalContext);
 
   // Still checking token → show loader
   if (loadingUser) {
@@ -15,8 +14,8 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Not logged in → redirect
-  if (!user) {
+  // If token exists but user is still null → wait
+  if (!loadingUser && !user && !token) {
     return <Navigate to="/login" replace />;
   }
 

@@ -1,4 +1,3 @@
-// models/oauthAccount.js
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
 
@@ -12,19 +11,19 @@ OAuthAccount.init(
       defaultValue: DataTypes.UUIDV4,
     },
     provider: {
-      type: DataTypes.STRING(50), // "google", "github", "apple"
+      type: DataTypes.STRING(50), // e.g. "google", "github", "apple"
       allowNull: false,
     },
     providerId: {
-      type: DataTypes.STRING(255), // the unique ID from provider (sub, id)
+      type: DataTypes.STRING(255), // provider’s unique ID (sub)
       allowNull: false,
     },
     accessToken: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(2000), // use STRING instead of TEXT for portability
       allowNull: true,
     },
     refreshToken: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING(2000),
       allowNull: true,
     },
     expiresAt: {
@@ -37,7 +36,13 @@ OAuthAccount.init(
     modelName: "OAuthAccount",
     tableName: "oauth_accounts",
     timestamps: true,
-    paranoid: true, // soft delete in case you want to unlink
+    paranoid: true, // soft delete for unlinking
+    indexes: [
+      {
+        unique: true,
+        fields: ["provider", "providerId"], // enforce one providerId per provider
+      },
+    ],
   }
 );
 

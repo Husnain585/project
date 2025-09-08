@@ -93,9 +93,17 @@ CartItem.belongsTo(Product, { foreignKey: "productId" });
 User.hasOne(emailCheck, { foreignKey: "userId", as: "emailCheck" });
 emailCheck.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-// Users ↔ OAuthAccounts (one-to-many)
-User.hasMany(OAuthAccount, { foreignKey: "userId", as: "oauthAccounts" });
-OAuthAccount.belongsTo(User, { foreignKey: "userId", as: "user" });
+// One User can have multiple OAuth accounts (Google, GitHub, Apple, etc.)
+User.hasMany(OAuthAccount, {
+  foreignKey: "userId",
+  as: "oauthAccounts",
+  onDelete: "CASCADE", // delete OAuthAccounts when User is deleted
+});
+
+OAuthAccount.belongsTo(User, {
+  foreignKey: "userId",
+  as: "user",
+});
 
 // Build db object
 const db = {};
