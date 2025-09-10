@@ -1,17 +1,35 @@
 import React, { useEffect, useState } from "react";
+import { useGlobalContext } from "../context/GlobalContext";
 import useAdmin from "../hooks/useAdmin";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
+  const { user, loadingUser } = useGlobalContext();
   const { getAllOrders, statusOrder, createCategory, createProduct } = useAdmin();
+  const navigate = useNavigate();
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Category form
-  const [categoryData, setCategoryData] = useState({ name: "", description: "" });
+  // Redirect unauthorized users
+  useEffect(() => {
+    if (!loadingUser) {
+      if (!user) {
+        navigate("/login"); // not logged in → login
+      } else if (user.role?.toLowerCase() !== "admin") {
+        navigate("/"); // not admin → home
+      }
+    }
+  }, [user, loadingUser, navigate]);
 
-  // Product form
+  // Category form state
+  const [categoryData, setCategoryData] = useState({
+    name: "",
+    description: "",
+  });
+
+  // Product form state
   const [productData, setProductData] = useState({
     categoryId: "",
     name: "",
@@ -36,8 +54,12 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (user?.role?.toLowerCase() === "admin") {
+      fetchOrders();
+    }
+  }, [user]);
+
+  if (loadingUser) return <div className="p-8">Checking authorization...</div>;
 
   // Update order status
   const updateStatus = async (orderId, status) => {
@@ -84,7 +106,7 @@ const AdminDashboard = () => {
     <div className="p-8 space-y-12 bg-gray-50 min-h-screen mt-20">
       <h1 className="text-3xl font-bold text-gray-800">⚙️ Admin Dashboard</h1>
 
-      {/* Orders */}
+      {/* Orders Section */}
       <section className="bg-white shadow-md rounded-xl p-6">
         <h2 className="text-xl font-semibold mb-4">📦 Manage Orders</h2>
         {loading && <div className="text-blue-600">Loading orders...</div>}
@@ -100,22 +122,40 @@ const AdminDashboard = () => {
                 className="border rounded-lg p-5 shadow-sm bg-gray-50"
               >
                 <div className="grid md:grid-cols-2 gap-2 text-sm">
-                  <p><span className="font-semibold">Order ID:</span> {order.orderId}</p>
-                  <p><span className="font-semibold">User ID:</span> {order.userId}</p>
-                  <p><span className="font-semibold">Status:</span> 
-                    <span className={`ml-1 px-2 py-1 rounded text-white ${
-                      order.status === "paid"
-                        ? "bg-green-500"
-                        : order.status === "canceled"
-                        ? "bg-red-500"
-                        : "bg-yellow-500"
-                    }`}>
+                  <p>
+                    <span className="font-semibold">Order ID:</span>{" "}
+                    {order.orderId}
+                  </p>
+                  <p>
+                    <span className="font-semibold">User ID:</span>{" "}
+                    {order.userId}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Status:</span>
+                    <span
+                      className={`ml-1 px-2 py-1 rounded text-white ${
+                        order.status === "paid"
+                          ? "bg-green-500"
+                          : order.status === "canceled"
+                          ? "bg-red-500"
+                          : "bg-yellow-500"
+                      }`}
+                    >
                       {order.status}
                     </span>
                   </p>
-                  <p><span className="font-semibold">Total:</span> ₹{order.totalAmount}</p>
-                  <p><span className="font-semibold">Created:</span> {new Date(order.createdAt).toLocaleString()}</p>
-                  <p><span className="font-semibold">Updated:</span> {new Date(order.updatedAt).toLocaleString()}</p>
+                  <p>
+                    <span className="font-semibold">Total:</span> ₹
+                    {order.totalAmount}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Created:</span>{" "}
+                    {new Date(order.createdAt).toLocaleString()}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Updated:</span>{" "}
+                    {new Date(order.updatedAt).toLocaleString()}
+                  </p>
                 </div>
 
                 {/* Order Items */}
@@ -140,12 +180,22 @@ const AdminDashboard = () => {
                           key={item.orderItemId}
                           className="hover:bg-gray-100 transition"
                         >
-                          <td className="border px-3 py-2">{item.product?.name}</td>
-                          <td className="border px-3 py-2">{item.product?.description}</td>
-                          <td className="border px-3 py-2 text-center">{item.quantity}</td>
+                          <td className="border px-3 py-2">
+                            {item.product?.name}
+                          </td>
+                          <td className="border px-3 py-2">
+                            {item.product?.description}
+                          </td>
+                          <td className="border px-3 py-2 text-center">
+                            {item.quantity}
+                          </td>
                           <td className="border px-3 py-2">₹{item.price}</td>
-                          <td className="border px-3 py-2 text-center">{item.product?.stock}</td>
-                          <td className="border px-3 py-2">₹{item.product?.originalPrice}</td>
+                          <td className="border px-3 py-2 text-center">
+                            {item.product?.stock}
+                          </td>
+                          <td className="border px-3 py-2">
+                            ₹{item.product?.originalPrice}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -178,98 +228,137 @@ const AdminDashboard = () => {
       </section>
 
       {/* Create Category */}
-      {/* Create Category */}
-<section className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-  <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-    📂 Create Category
-  </h2>
-  <form onSubmit={handleCategorySubmit} className="space-y-5 max-w-lg">
-    <div>
-      <label className="block text-sm font-medium text-gray-600 mb-1">
-        Category Name
-      </label>
-      <input
-        type="text"
-        placeholder="e.g., Electric Bike"
-        value={categoryData.name}
-        onChange={(e) =>
-          setCategoryData((prev) => ({ ...prev, name: e.target.value }))
-        }
-        className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-400 outline-none transition"
-      />
-    </div>
+      <section className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+          📂 Create Category
+        </h2>
+        <form onSubmit={handleCategorySubmit} className="space-y-5 max-w-lg">
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Category Name
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Electric Bike"
+              value={categoryData.name}
+              onChange={(e) =>
+                setCategoryData((prev) => ({ ...prev, name: e.target.value }))
+              }
+              className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-400 outline-none transition"
+            />
+          </div>
 
-    <div>
-      <label className="block text-sm font-medium text-gray-600 mb-1">
-        Description
-      </label>
-      <textarea
-        placeholder="Short description about this category..."
-        value={categoryData.description}
-        onChange={(e) =>
-          setCategoryData((prev) => ({ ...prev, description: e.target.value }))
-        }
-        className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-400 outline-none transition"
-      />
-    </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Description
+            </label>
+            <textarea
+              placeholder="Short description about this category..."
+              value={categoryData.description}
+              onChange={(e) =>
+                setCategoryData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-400 outline-none transition"
+            />
+          </div>
 
-    <button
-      type="submit"
-      className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-5 py-2 rounded-lg w-full flex items-center justify-center gap-2 transition"
-    >
-      ➕ Add Category
-    </button>
-  </form>
-</section>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-5 py-2 rounded-lg w-full flex items-center justify-center gap-2 transition"
+          >
+            ➕ Add Category
+          </button>
+        </form>
+      </section>
 
-{/* Create Product */}
-<section className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
-  <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-    🛒 Create Product
-  </h2>
-  <form onSubmit={handleProductSubmit} className="space-y-5 max-w-lg">
-    {[
-      { label: "Category ID", key: "categoryId", type: "text", placeholder: "Enter category ID" },
-      { label: "Product Name", key: "name", type: "text", placeholder: "e.g., Bike L100 Model" },
-      { label: "Description", key: "description", type: "textarea", placeholder: "Short product description..." },
-      { label: "Price", key: "price", type: "number", placeholder: "e.g., 477000" },
-      { label: "Stock", key: "stock", type: "number", placeholder: "e.g., 100" },
-      { label: "Original Price", key: "originalPrice", type: "number", placeholder: "e.g., 590000" },
-    ].map(({ label, key, type, placeholder }) => (
-      <div key={key}>
-        <label className="block text-sm font-medium text-gray-600 mb-1">{label}</label>
-        {type === "textarea" ? (
-          <textarea
-            placeholder={placeholder}
-            value={productData[key]}
-            onChange={(e) =>
-              setProductData((prev) => ({ ...prev, [key]: e.target.value }))
-            }
-            className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-purple-400 outline-none transition"
-          />
-        ) : (
-          <input
-            type={type}
-            placeholder={placeholder}
-            value={productData[key]}
-            onChange={(e) =>
-              setProductData((prev) => ({ ...prev, [key]: e.target.value }))
-            }
-            className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-purple-400 outline-none transition"
-          />
-        )}
-      </div>
-    ))}
+      {/* Create Product */}
+      <section className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition">
+        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+          🛒 Create Product
+        </h2>
+        <form onSubmit={handleProductSubmit} className="space-y-5 max-w-lg">
+          {[
+            {
+              label: "Category ID",
+              key: "categoryId",
+              type: "text",
+              placeholder: "Enter category ID",
+            },
+            {
+              label: "Product Name",
+              key: "name",
+              type: "text",
+              placeholder: "e.g., Bike L100 Model",
+            },
+            {
+              label: "Description",
+              key: "description",
+              type: "textarea",
+              placeholder: "Short product description...",
+            },
+            {
+              label: "Price",
+              key: "price",
+              type: "number",
+              placeholder: "e.g., 477000",
+            },
+            {
+              label: "Stock",
+              key: "stock",
+              type: "number",
+              placeholder: "e.g., 100",
+            },
+            {
+              label: "Original Price",
+              key: "originalPrice",
+              type: "number",
+              placeholder: "e.g., 590000",
+            },
+          ].map(({ label, key, type, placeholder }) => (
+            <div key={key}>
+              <label className="block text-sm font-medium text-gray-600 mb-1">
+                {label}
+              </label>
+              {type === "textarea" ? (
+                <textarea
+                  placeholder={placeholder}
+                  value={productData[key]}
+                  onChange={(e) =>
+                    setProductData((prev) => ({
+                      ...prev,
+                      [key]: e.target.value,
+                    }))
+                  }
+                  className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-purple-400 outline-none transition"
+                />
+              ) : (
+                <input
+                  type={type}
+                  placeholder={placeholder}
+                  value={productData[key]}
+                  onChange={(e) =>
+                    setProductData((prev) => ({
+                      ...prev,
+                      [key]: e.target.value,
+                    }))
+                  }
+                  className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-purple-400 outline-none transition"
+                />
+              )}
+            </div>
+          ))}
 
-    <button
-      type="submit"
-      className="bg-purple-500 hover:bg-purple-600 text-white font-medium px-5 py-2 rounded-lg w-full flex items-center justify-center gap-2 transition"
-    >
-      ➕ Add Product
-    </button>
-  </form>
-</section>
-
+          <button
+            type="submit"
+            className="bg-purple-500 hover:bg-purple-600 text-white font-medium px-5 py-2 rounded-lg w-full flex items-center justify-center gap-2 transition"
+          >
+            ➕ Add Product
+          </button>
+        </form>
+      </section>
     </div>
   );
 };

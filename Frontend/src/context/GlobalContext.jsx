@@ -23,7 +23,7 @@ export const GlobalProvider = ({ children }) => {
   const [token, setToken] = useState(
     localStorage.getItem(config.storageKeys.authToken) || null
   );
-  const [loadingUser, setLoadingUser] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   // -------------------------
   // Products & Categories
@@ -32,6 +32,14 @@ export const GlobalProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // -------------------------
+  // Vendors
+  // -------------------------
+  const [vendors, setVendors] = useState([]);
+  const [vendorProducts, setVendorProducts] = useState([]);
+  const [loadingVendors, setLoadingVendors] = useState(false);
+  const [loadingVendorProducts, setLoadingVendorProducts] = useState(false);
 
   // -------------------------
   // Cart
@@ -86,6 +94,7 @@ export const GlobalProvider = ({ children }) => {
   const fetchUser = async () => {
     if (!token) {
       setUser(null);
+      setLoadingUser(false);
       return;
     }
     try {
@@ -93,11 +102,18 @@ export const GlobalProvider = ({ children }) => {
       const res = await axiosInstance.get("/user/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // If your backend sends back a fresh token, store it
+      if (res.data.token) {
+        setToken(res.data.token);
+        localStorage.setItem(config.storageKeys.authToken, res.data.token);
+      }
+
       setUser(res.data.user || res.data);
     } catch (err) {
       console.error("Failed to fetch user:", err);
       setUser(null);
       setToken(null);
+      localStorage.removeItem(config.storageKeys.authToken);
     } finally {
       setLoadingUser(false);
     }
@@ -179,6 +195,53 @@ export const GlobalProvider = ({ children }) => {
     fetchProducts();
     fetchCategories();
   }, []);
+
+  // Vendor
+  // Fetch all vendors
+  const fetchVendors = async () => {
+    try {
+      setLoadingVendors(true);
+      const res = await axiosInstance.get("/vendor", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setVendors(res.data.vendors || res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch vendors", err);
+    } finally {
+      setLoadingVendors(false);
+    }
+  };
+
+  // Fetch products for a specific vendor
+  const fetchVendorProducts = async (vendorId) => {
+    try {
+      setLoadingVendorProducts(true);
+      const res = await axiosInstance.get(`/vendor/${vendorId}/products`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setVendorProducts(res.data.products || res.data || []);
+    } catch (err) {
+      console.error(`Failed to fetch products for vendor ${vendorId}`, err);
+    } finally {
+      setLoadingVendorProducts(false);
+    }
+  };
+
+  // Create a new vendor
+  const createVendor = async (vendorData) => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      const res = await axiosInstance.post("/vendor", vendorData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // Optionally refresh the vendor list
+      fetchVendors();
+      return res.data.vendor || res.data;
+    } catch (err) {
+      console.error("Failed to create vendor", err);
+      throw err;
+    }
+  };
 
   // -------------------------
   // Cart
@@ -375,6 +438,10 @@ export const GlobalProvider = ({ children }) => {
           statusOrder,
           createCategory,
           createProduct,
+          // Vendor
+          fetchVendors,
+          fetchVendorProducts,
+          createVendor,
         }}
       >
         {children}

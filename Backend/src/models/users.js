@@ -36,7 +36,7 @@ User.init(
       validate: { isEmail: true },
     },
     role: {
-      type: DataTypes.ENUM("customer", "admin"),
+      type: DataTypes.ENUM("customer", "admin", "vendor"), // <-- added "vendor"
       allowNull: false,
       defaultValue: "customer",
     },

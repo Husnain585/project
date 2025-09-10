@@ -7,12 +7,12 @@ module.exports = {
     try {
       const user = await User.findOne({
         where: { userId: req.user.userId },
-        attributes: { exclude: ["password"] },
+        attributes: { exclude: ["password"], include: ["role"] },
         include: [
           {
             model: OAuthAccount,
             as: "oauthAccounts",
-            attributes: ["provider", "providerUserId"],
+            attributes: ["provider", "providerId"],
           },
         ],
       });

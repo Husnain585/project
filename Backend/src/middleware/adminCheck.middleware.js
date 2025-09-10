@@ -10,7 +10,10 @@ module.exports = {
       return res.status(403).json({ message: "Access denied. Admins only." });
     } catch (error) {
       console.error("Admin Check Error:", error);
-      return res.status(500).json({ error: "Internal Server Error", details: error.message });
+      return res.status(500).json({ error: "Internal Server Error" });
     }
   },
+  new: (req, res) => {
+    return console.log("new");
+  }
 };

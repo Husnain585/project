@@ -159,7 +159,7 @@ module.exports = {
         username: usernameInput,
         email: emailInput,
         password: hashedPassword,
-        role: role && ["admin", "customer"].includes(role) ? role : "customer",
+        role: role && ["admin", "customer", "vendor"].includes(role) ? role : "customer",
       });
 
       try {

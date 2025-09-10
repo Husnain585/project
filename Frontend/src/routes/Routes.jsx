@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import ProtectedRoute from "../routes/ProtectedRoute";
+import VendorRoute from "./VendorRoute";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
@@ -16,7 +17,9 @@ const Wishlist = lazy(() => import("../pages/Wishlist"));
 const Cart = lazy(() => import("../pages/Cart"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const Shop = lazy(() => import("../pages/Shop"));
-const CategoryProducts = lazy(() => import("../components/categoryProduct/CategoryProducts"));
+const CategoryProducts = lazy(() =>
+  import("../components/categoryProduct/CategoryProducts")
+);
 const Profile = lazy(() => import("../pages/Profile"));
 const Contact = lazy(() => import("../pages/Contact"));
 const Checkout = lazy(() => import("../pages/Checkout"));
@@ -24,6 +27,8 @@ const OrderSuccess = lazy(() => import("../pages/OrderSuccess"));
 const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
 const GoogleLoginPage = lazy(() => import("../pages/auth/GoogleLoginPage"));
 const GithubLoginPage = lazy(() => import("../pages/auth/GithubLoginPage"));
+const AdminRoute = lazy(() => import("./AdminRoute"));
+const VendorDashboard = lazy(() => import("../pages/VendorDashboard"));
 
 const Spinner = lazy(() => import("../components/ui/loadingSpinner/Spinner"));
 
@@ -61,28 +66,147 @@ const AppRoutes = () => {
       >
         <Routes location={location} key={location.pathname}>
           {/* Public Routes */}
-          <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
-          <Route path="/products" element={<PageWrapper><Products /></PageWrapper>} />
-          <Route path="/categories" element={<PageWrapper><Categories /></PageWrapper>} />
-          <Route path="/category/:categoryId" element={<PageWrapper><CategoryProducts /></PageWrapper>} />
-          <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
-          <Route path="/shop" element={<PageWrapper><Shop /></PageWrapper>} />
-          <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />
-          <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-          <Route path="/forgot-password" element={<PageWrapper><ForgotPassword /></PageWrapper>} />
-          <Route path="/google" element={<PageWrapper><GoogleLoginPage /></PageWrapper>} />
-          <Route path="/github" element={<PageWrapper><GithubLoginPage /></PageWrapper>} />
-          <Route path="/register" element={<PageWrapper><Register /></PageWrapper>} />
-          <Route path="/check-email" element={<PageWrapper><CheckEmail /></PageWrapper>} />
-          <Route path="/product/:productId" element={<PageWrapper><ProductDetails /></PageWrapper>} />
-          <Route path="/admin" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
+          <Route
+            path="/"
+            element={
+              <PageWrapper>
+                <Home />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <PageWrapper>
+                <Products />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <PageWrapper>
+                <Categories />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/category/:categoryId"
+            element={
+              <PageWrapper>
+                <CategoryProducts />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PageWrapper>
+                <About />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/shop"
+            element={
+              <PageWrapper>
+                <Shop />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <PageWrapper>
+                <Contact />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <PageWrapper>
+                <Login />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <PageWrapper>
+                <ForgotPassword />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/google"
+            element={
+              <PageWrapper>
+                <GoogleLoginPage />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/github"
+            element={
+              <PageWrapper>
+                <GithubLoginPage />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PageWrapper>
+                <Register />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/check-email"
+            element={
+              <PageWrapper>
+                <CheckEmail />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/product/:productId"
+            element={
+              <PageWrapper>
+                <ProductDetails />
+              </PageWrapper>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <PageWrapper>
+                  <AdminDashboard />
+                </PageWrapper>
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/vendor"
+            element={
+              <VendorRoute>
+                <PageWrapper>
+                  <VendorDashboard />
+                </PageWrapper>
+              </VendorRoute>
+            }
+          />
 
           {/* Protected Routes */}
           <Route
             path="/wishlist"
             element={
               <ProtectedRoute>
-                <PageWrapper><Wishlist /></PageWrapper>
+                <PageWrapper>
+                  <Wishlist />
+                </PageWrapper>
               </ProtectedRoute>
             }
           />
@@ -90,7 +214,9 @@ const AppRoutes = () => {
             path="/cart"
             element={
               <ProtectedRoute>
-                <PageWrapper><Cart /></PageWrapper>
+                <PageWrapper>
+                  <Cart />
+                </PageWrapper>
               </ProtectedRoute>
             }
           />
@@ -98,7 +224,9 @@ const AppRoutes = () => {
             path="/profile"
             element={
               <ProtectedRoute>
-                <PageWrapper><Profile /></PageWrapper>
+                <PageWrapper>
+                  <Profile />
+                </PageWrapper>
               </ProtectedRoute>
             }
           />
@@ -106,7 +234,9 @@ const AppRoutes = () => {
             path="/checkout"
             element={
               <ProtectedRoute>
-                <PageWrapper><Checkout /></PageWrapper>
+                <PageWrapper>
+                  <Checkout />
+                </PageWrapper>
               </ProtectedRoute>
             }
           />
@@ -114,7 +244,9 @@ const AppRoutes = () => {
             path="/order-success"
             element={
               <ProtectedRoute>
-                <PageWrapper><OrderSuccess /></PageWrapper>
+                <PageWrapper>
+                  <OrderSuccess />
+                </PageWrapper>
               </ProtectedRoute>
             }
           />
