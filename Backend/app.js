@@ -19,6 +19,7 @@ const wishlist = require("./src/routes/wishlist.route");
 const orderRoutes = require("./src/routes/order.route");
 const checkoutRoutes = require("./src/routes/checkout.route");
 const emailCheck = require("./src/routes/emailCheck.route")
+const vendorRoutes = require("./src/routes/vendor.route")
 
 // CORS
 const allowedOrigins = [
@@ -54,6 +55,7 @@ app.use("/api/wishlist", wishlist);
 app.use("/api/order", orderRoutes);
 app.use("/api/checkout", checkoutRoutes);
 app.use("/api/auth", emailCheck);
+app.use("/api/vendor", vendorRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

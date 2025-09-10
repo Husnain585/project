@@ -2,6 +2,7 @@ const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
 const { v4: uuid } = require("uuid");
 const Category = require("./category");
+const Vendor = require("./vendor"); 
 
 class Product extends Model {}
 
@@ -29,7 +30,6 @@ Product.init(
       allowNull: false,
       defaultValue: 0,
     },
-    // ❌ Removed `images` column (handled by ProductImage association)
     originalPrice: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
@@ -39,13 +39,18 @@ Product.init(
       allowNull: false,
       references: { model: Category, key: "categoryId" },
     },
+    vendorId: {
+      type: DataTypes.UUID,
+      allowNull: true, 
+      references: { model: Vendor, key: "vendorId" },
+    },
   },
   {
     sequelize: connection,
     modelName: "Product",
     tableName: "products",
     timestamps: true,
-    paranoid: true, // soft deletes
+    paranoid: true, 
   }
 );
 

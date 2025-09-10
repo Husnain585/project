@@ -5,7 +5,8 @@ module.exports = {
   // Create a new product
   createProduct: async (req, res) => {
     try {
-      const { name, description, price, stock, categoryId, originalPrice } = req.body;
+      const { name, description, price, stock, categoryId, originalPrice } =
+        req.body;
 
       if (!name || !price || !categoryId) {
         return res
@@ -33,7 +34,9 @@ module.exports = {
       return res.status(201).json({ message: "Product created", product });
     } catch (error) {
       console.error("Create Product Error:", error);
-      return res.status(500).json({ error: "Server error", errorDetails: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", errorDetails: error.message });
     }
   },
 
@@ -53,7 +56,9 @@ module.exports = {
       return res.status(200).json({ products });
     } catch (error) {
       console.error("Get Products Error:", error);
-      return res.status(500).json({ error: "Server error", errorDetails: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", errorDetails: error.message });
     }
   },
 
@@ -77,7 +82,9 @@ module.exports = {
       return res.status(200).json({ product });
     } catch (error) {
       console.error("Get Product Error:", error);
-      return res.status(500).json({ error: "Server error", errorDetails: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", errorDetails: error.message });
     }
   },
 
@@ -85,7 +92,8 @@ module.exports = {
   updateProduct: async (req, res) => {
     try {
       const { productId } = req.params;
-      const { name, description, price, stock, categoryId, originalPrice } = req.body;
+      const { name, description, price, stock, categoryId, originalPrice } =
+        req.body;
 
       const product = await Product.findByPk(productId);
       if (!product) return res.status(404).json({ error: "Product not found" });
@@ -95,14 +103,17 @@ module.exports = {
       product.price = price || product.price;
       product.stock = stock !== undefined ? stock : product.stock;
       product.categoryId = categoryId || product.categoryId;
-      product.originalPrice = originalPrice !== undefined ? originalPrice : product.originalPrice;
+      product.originalPrice =
+        originalPrice !== undefined ? originalPrice : product.originalPrice;
 
       await product.save();
 
       return res.status(200).json({ message: "Product updated", product });
     } catch (error) {
       console.error("Update Product Error:", error);
-      return res.status(500).json({ error: "Server error", errorDetails: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", errorDetails: error.message });
     }
   },
 
@@ -118,7 +129,12 @@ module.exports = {
       return res.status(200).json({ message: "Product deleted", product });
     } catch (error) {
       console.error("Delete Product Error:", error);
-      return res.status(500).json({ error: "Server error", errorDetails: error.message });
+      return res
+        .status(500)
+        .json({ error: "Server error", errorDetails: error.message });
     }
+  },
+  getProductsByVendorId: async (vendorId) => {
+    return await Product.findAll({ where: { vendorId } });
   },
 };
