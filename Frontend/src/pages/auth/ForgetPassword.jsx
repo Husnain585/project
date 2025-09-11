@@ -1,13 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import axiosInstance from "../../utils/axiosInstance"; // adjust path as needed
+import axiosInstance from "../../utils/axiosInstance";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [sentOnce, setSentOnce] = useState(false); // track if link was sent at least once
+  const [sentOnce, setSentOnce] = useState(false); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();

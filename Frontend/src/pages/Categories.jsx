@@ -11,7 +11,6 @@ const Categories = () => {
     const fetchCategories = async () => {
       try {
         const res = await axiosInstance.get("/category");
-        // ✅ supports both `{ categories: [...] }` and `[ ... ]`
         setCategories(res.data.categories || res.data);
       } catch (err) {
         console.error("Error fetching categories:", err);
