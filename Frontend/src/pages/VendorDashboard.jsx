@@ -3,7 +3,8 @@ import { useGlobalContext } from "../context/GlobalContext";
 import { useNavigate } from "react-router-dom";
 
 const VendorDashboard = () => {
-  const { user, loadingUser, products, createProduct } = useGlobalContext();
+  const { user, loadingUser, products, createProduct, categories } =
+    useGlobalContext();
   const [vendorProducts, setVendorProducts] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
@@ -14,6 +15,7 @@ const VendorDashboard = () => {
     contactEmail: "",
     contactPhone: "",
     status: "active",
+    categoryId: "",
   });
   const [error, setError] = useState(null);
   const [loadingCreate, setLoadingCreate] = useState(false);
@@ -29,8 +31,10 @@ const VendorDashboard = () => {
 
   // Filter vendor's products
   useEffect(() => {
-    if (products?.length && user?.userId) {
-      const filtered = products.filter((p) => p.vendorId === user.userId);
+    if (products?.length && (user?.id || user?.userId)) {
+      const filtered = products.filter(
+        (p) => p.vendorId === (user.id || user.userId)
+      );
       setVendorProducts(filtered);
     }
   }, [products, user]);
@@ -44,8 +48,13 @@ const VendorDashboard = () => {
   // Create product
   const handleCreateProduct = async (e) => {
     e.preventDefault();
-    if (!newProduct.name || !newProduct.contactEmail || !newProduct.contactPhone) {
-      setError("Name, contact email and contact phone are required");
+    if (
+      !newProduct.name ||
+      !newProduct.contactEmail ||
+      !newProduct.contactPhone ||
+      !newProduct.categoryId
+    ) {
+      setError("Name, contact email, contact phone, and category are required");
       return;
     }
 
@@ -53,9 +62,10 @@ const VendorDashboard = () => {
       setLoadingCreate(true);
       await createProduct({
         ...newProduct,
-        vendorId: user.userId,
+        vendorId: user?.id || user?.userId,
         price: Number(newProduct.price || 0),
         stock: Number(newProduct.stock || 0),
+        categoryId: Number(newProduct.categoryId),
       });
       setNewProduct({
         name: "",
@@ -65,11 +75,12 @@ const VendorDashboard = () => {
         contactEmail: "",
         contactPhone: "",
         status: "active",
+        categoryId: "",
       });
       setModalOpen(false);
       setError(null);
     } catch (err) {
-      setError(err.message || "Failed to create product");
+      setError(err.response?.data?.error || err.message || "Failed to create product");
     } finally {
       setLoadingCreate(false);
     }
@@ -102,18 +113,24 @@ const VendorDashboard = () => {
             You have no products yet.
           </div>
         )}
-        {vendorProducts.map((product) => (
+        {vendorProducts.map((product, index) => (
           <div
-            key={product.productId}
+            key={product.productId || index}
             className="bg-white shadow-md rounded-lg p-5 hover:shadow-xl transition relative flex flex-col"
           >
             <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
             <p className="text-gray-500 text-sm mb-2">{product.description}</p>
             <p className="text-purple-600 font-bold text-lg mb-1">${product.price}</p>
             <p className="text-gray-400 text-sm mb-1">Stock: {product.stock}</p>
-            <p className="text-gray-400 text-sm mb-1">Email: {product.contactEmail}</p>
-            <p className="text-gray-400 text-sm mb-1">Phone: {product.contactPhone}</p>
-            <p className="text-green-600 text-sm font-semibold">Status: {product.status}</p>
+            <p className="text-gray-400 text-sm mb-1">
+              Email: {product.contactEmail}
+            </p>
+            <p className="text-gray-400 text-sm mb-1">
+              Phone: {product.contactPhone}
+            </p>
+            <p className="text-green-600 text-sm font-semibold">
+              Status: {product.status}
+            </p>
           </div>
         ))}
       </div>
@@ -154,6 +171,7 @@ const VendorDashboard = () => {
                 onChange={handleChange}
                 placeholder="Price"
                 className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
               />
               <input
                 type="number"
@@ -181,6 +199,20 @@ const VendorDashboard = () => {
                 className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
                 required
               />
+              <select
+                name="categoryId"
+                value={newProduct.categoryId}
+                onChange={handleChange}
+                className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
               <select
                 name="status"
                 value={newProduct.status}
