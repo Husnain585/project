@@ -19,6 +19,7 @@ const {
 // OAuth clients
 const google = require("../config/oauth/google");
 const github = require("../config/oauth/github");
+const Vendor = require("../models/vendor");
 
 // Google ID token verification
 let verifyIdTokenWithGoogle;
@@ -72,8 +73,10 @@ module.exports = {
       if (!user) return res.status(401).json({ error: "User not found" });
 
       const isValid = await compare(password.trim(), user.password);
-      if (!isValid) return res.status(401).json({ error: "Invalid credentials" });
+      if (!isValid)
+        return res.status(401).json({ error: "Invalid credentials" });
 
+      // Check email verification
       const emailRecord = await emailCheck.findOne({
         where: { userId: user.userId },
       });
@@ -83,11 +86,29 @@ module.exports = {
           .json({ error: "Please verify your email before login" });
       }
 
+      // Attach vendorId if vendor
+      let vendorId = null;
+      if (user.role.toLowerCase() === "vendor") {
+        const vendor = await Vendor.findOne({
+          where: { userId: user.userId },
+          attributes: ["vendorId", "userId"],
+        });
+
+        if (vendor) {
+          vendorId = vendor.vendorId;
+        } else {
+          console.log("⚠️ Vendor role but no vendor record for userId:", user.userId);
+        }
+      }
+
+      // JWT payload
       const payload = {
         userId: user.userId,
         username: user.username,
         role: user.role,
+        vendorId: vendorId || null, // always include vendorId, even if null
       };
+
       const token = sign(payload, process.env.SECRET, { expiresIn: "15m" });
 
       res.cookie("auth", token, {
@@ -159,9 +180,20 @@ module.exports = {
         username: usernameInput,
         email: emailInput,
         password: hashedPassword,
-        role: role && ["admin", "customer", "vendor"].includes(role) ? role : "customer",
+        role:
+          role && ["admin", "customer", "vendor"].includes(role)
+            ? role
+            : "customer",
       });
-
+         // 🔹 If user is a vendor, auto-create Vendor record
+      if (newUser.role === "vendor") {
+        await Vendor.create({
+          userId: newUser.userId,
+          name: newUser.name,
+          contactEmail: newUser.email,
+          status: "pending",
+        });
+      }
       try {
         await sendVerificationEmail(
           { body: { userId: newUser.userId } },
@@ -223,7 +255,8 @@ module.exports = {
       const idToken = tokens.idToken?.() || null;
       const claims = idToken ? await verifyIdTokenWithGoogle(idToken) : null;
 
-      if (!claims) return res.status(400).send("Unable to verify Google ID token");
+      if (!claims)
+        return res.status(400).send("Unable to verify Google ID token");
 
       const user = await handleOAuthLogin("google", claims, {
         accessToken: tokens.accessToken?.(),

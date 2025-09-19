@@ -1,10 +1,12 @@
+// src/pages/VendorDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useGlobalContext } from "../context/GlobalContext";
 import { useNavigate } from "react-router-dom";
-
+import { jwtDecode } from "jwt-decode";
 const VendorDashboard = () => {
   const { user, loadingUser, products, createProduct, categories } =
     useGlobalContext();
+
   const [vendorProducts, setVendorProducts] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
@@ -29,12 +31,10 @@ const VendorDashboard = () => {
     }
   }, [user, loadingUser, navigate]);
 
-  // Filter vendor's products
+  // Filter products that belong to this vendor
   useEffect(() => {
-    if (products?.length && (user?.id || user?.userId)) {
-      const filtered = products.filter(
-        (p) => p.vendorId === (user.id || user.userId)
-      );
+    if (products?.length && user?.vendorId) {
+      const filtered = products.filter((p) => p.vendorId === user.vendorId);
       setVendorProducts(filtered);
     }
   }, [products, user]);
@@ -48,13 +48,14 @@ const VendorDashboard = () => {
   // Create product
   const handleCreateProduct = async (e) => {
     e.preventDefault();
-    if (
-      !newProduct.name ||
-      !newProduct.contactEmail ||
-      !newProduct.contactPhone ||
-      !newProduct.categoryId
-    ) {
-      setError("Name, contact email, contact phone, and category are required");
+
+    // Validate required fields
+    if (!newProduct.name || !newProduct.price || !newProduct.categoryId) {
+      setError("Name, price, and category are required");
+      return;
+    }
+    if (!newProduct.contactEmail || !newProduct.contactPhone) {
+      setError("Contact email and contact phone are required");
       return;
     }
 
@@ -62,11 +63,13 @@ const VendorDashboard = () => {
       setLoadingCreate(true);
       await createProduct({
         ...newProduct,
-        vendorId: user?.id || user?.userId,
-        price: Number(newProduct.price || 0),
-        stock: Number(newProduct.stock || 0),
-        categoryId: Number(newProduct.categoryId),
+        price: Number(newProduct.price),
+        stock: Number(newProduct.stock || 10),
+        categoryId: newProduct.categoryId,
+        vendorId: user.vendorId, // ✅ always attach vendorId from JWT
       });
+
+      // Reset form
       setNewProduct({
         name: "",
         description: "",
@@ -80,7 +83,9 @@ const VendorDashboard = () => {
       setModalOpen(false);
       setError(null);
     } catch (err) {
-      setError(err.response?.data?.error || err.message || "Failed to create product");
+      setError(
+        err.response?.data?.error || err.message || "Failed to create product"
+      );
     } finally {
       setLoadingCreate(false);
     }
@@ -96,6 +101,7 @@ const VendorDashboard = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Vendor Dashboard</h1>
         <button
@@ -113,14 +119,18 @@ const VendorDashboard = () => {
             You have no products yet.
           </div>
         )}
-        {vendorProducts.map((product, index) => (
+        {vendorProducts.map((product) => (
           <div
-            key={product.productId || index}
+            key={product.productId}
             className="bg-white shadow-md rounded-lg p-5 hover:shadow-xl transition relative flex flex-col"
           >
-            <h2 className="text-lg font-semibold text-gray-800">{product.name}</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              {product.name}
+            </h2>
             <p className="text-gray-500 text-sm mb-2">{product.description}</p>
-            <p className="text-purple-600 font-bold text-lg mb-1">${product.price}</p>
+            <p className="text-purple-600 font-bold text-lg mb-1">
+              ${product.price}
+            </p>
             <p className="text-gray-400 text-sm mb-1">Stock: {product.stock}</p>
             <p className="text-gray-400 text-sm mb-1">
               Email: {product.contactEmail}
@@ -147,6 +157,7 @@ const VendorDashboard = () => {
             </button>
             <h2 className="text-2xl font-bold mb-4">Add New Product</h2>
             {error && <p className="text-red-500 mb-2">{error}</p>}
+
             <form className="space-y-4" onSubmit={handleCreateProduct}>
               <input
                 type="text"
@@ -199,20 +210,22 @@ const VendorDashboard = () => {
                 className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
                 required
               />
+
               <select
                 name="categoryId"
                 value={newProduct.categoryId}
                 onChange={handleChange}
-                className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
                 required
+                className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
               >
                 <option value="">Select Category</option>
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
+                  <option key={cat.categoryId} value={cat.categoryId}>
                     {cat.name}
                   </option>
                 ))}
               </select>
+
               <select
                 name="status"
                 value={newProduct.status}
@@ -222,6 +235,7 @@ const VendorDashboard = () => {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+
               <button
                 type="submit"
                 disabled={loadingCreate}

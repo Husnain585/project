@@ -8,7 +8,7 @@ import React, {
 import config from "../config/config";
 import axiosInstance from "../utils/axiosInstance";
 import ThemeContext, { ThemeProvider } from "./ThemeContext";
-
+import {jwtDecode} from "jwt-decode";
 export const GlobalContext = createContext(null);
 
 // Helpers
@@ -92,32 +92,47 @@ export const GlobalProvider = ({ children }) => {
   // Fetch current user
   // -------------------------
   const fetchUser = async () => {
-    if (!token) {
-      setUser(null);
-      setLoadingUser(false);
-      return;
-    }
-    try {
-      setLoadingUser(true);
-      const res = await axiosInstance.get("/user/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // If your backend sends back a fresh token, store it
-      if (res.data.token) {
-        setToken(res.data.token);
-        localStorage.setItem(config.storageKeys.authToken, res.data.token);
-      }
+  if (!token) {
+    setUser(null);
+    setLoadingUser(false);
+    return;
+  }
+  try {
+    setLoadingUser(true);
 
-      setUser(res.data.user || res.data);
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-      setUser(null);
-      setToken(null);
-      localStorage.removeItem(config.storageKeys.authToken);
-    } finally {
-      setLoadingUser(false);
+    // Always decode JWT locally
+    const decoded = jwtDecode(token);
+    let enrichedUser = {
+      userId: decoded.userId,
+      username: decoded.username,
+      role: decoded.role,
+      vendorId: decoded.vendorId ?? null, // ✅ persist vendorId
+    };
+
+    // Optionally fetch from backend to keep in sync
+    const res = await axiosInstance.get("/user/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.data.user) {
+      enrichedUser = { ...enrichedUser, ...res.data.user };
     }
-  };
+
+    // If your backend returns a fresh token, update storage
+    if (res.data.token) {
+      setToken(res.data.token);
+      localStorage.setItem(config.storageKeys.authToken, res.data.token);
+    }
+
+    setUser(enrichedUser);
+  } catch (err) {
+    console.error("Failed to fetch user:", err);
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem(config.storageKeys.authToken);
+  } finally {
+    setLoadingUser(false);
+  }
+};
 
   useEffect(() => {
     fetchUser();
@@ -181,17 +196,16 @@ export const GlobalProvider = ({ children }) => {
     };
 
     const fetchCategories = async () => {
-      try {
-        setLoadingCategories(true);
-        const res = await axiosInstance.get("/category");
-        setCategories(res.data.categories || res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch categories", err);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
+  try {
+    setLoadingCategories(true);
+    const res = await axiosInstance.get("/category");
+    setCategories(res.data.categories || res.data || []);
+  } catch (err) {
+    console.error("Failed to fetch categories", err);
+  } finally {
+    setLoadingCategories(false);
+  }
+};
     fetchProducts();
     fetchCategories();
   }, []);
@@ -374,17 +388,19 @@ export const GlobalProvider = ({ children }) => {
   };
 
   const createProduct = async (productData) => {
-    if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.post("/product", productData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return res.data.product || res.data;
-    } catch (err) {
-      console.error("Failed to create product", err);
-      throw err;
-    }
-  };
+  if (!token) throw new Error("Not authenticated");
+  try {
+    const res = await axiosInstance.post("/product", productData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log("res data", res.data);
+    return res.data.product || res.data;
+  } catch (err) {
+    console.error("Failed to create product", err.response?.data || err.message);
+    throw err;
+  }
+};
+
 
   const createCategory = async (categoryData) => {
     if (!token) throw new Error("Not authenticated");

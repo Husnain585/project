@@ -1,7 +1,5 @@
 // controllers/vendor.controller.js
 const Vendor  = require("../models/vendor");
-
-// ✅ Create Vendor
 const createVendor = async (req, res) => {
   try {
     let { name, description, contactEmail, contactPhone, status } = req.body;
@@ -29,9 +27,6 @@ const createVendor = async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to create vendor" });
   }
 };
-
-
-// ✅ Get All Vendors
 const getVendors = async (req, res) => {
   try {
     const vendors = await Vendor.findAll();
@@ -41,8 +36,6 @@ const getVendors = async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to fetch vendors" });
   }
 };
-
-// ✅ Get Vendor by ID
 const getVendorById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -58,8 +51,6 @@ const getVendorById = async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to fetch vendor" });
   }
 };
-
-// ✅ Update Vendor
 const updateVendor = async (req, res) => {
   try {
     const { id } = req.params;
@@ -85,8 +76,6 @@ const updateVendor = async (req, res) => {
     return res.status(500).json({ success: false, message: "Failed to update vendor" });
   }
 };
-
-// ✅ Delete Vendor (soft delete because paranoid:true)
 const deleteVendor = async (req, res) => {
   try {
     const { id } = req.params;

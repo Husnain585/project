@@ -1,5 +1,6 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
+const {v4: uuid} = require("uuid")
 
 class User extends Model {
   toJSON() {
@@ -14,7 +15,7 @@ User.init(
     userId: {
       primaryKey: true,
       type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: uuid,
     },
     name: {
       type: DataTypes.STRING(100),

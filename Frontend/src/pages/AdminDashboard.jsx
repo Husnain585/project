@@ -16,9 +16,9 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (!loadingUser) {
       if (!user) {
-        navigate("/login"); // not logged in → login
+        navigate("/login");
       } else if (user.role?.toLowerCase() !== "admin") {
-        navigate("/"); // not admin → home
+        navigate("/");
       }
     }
   }, [user, loadingUser, navigate]);
@@ -38,6 +38,8 @@ const AdminDashboard = () => {
     stock: "",
     originalPrice: "",
   });
+  const [productImage, setProductImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -83,24 +85,35 @@ const AdminDashboard = () => {
     }
   };
 
-  // Create product
-  const handleProductSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createProduct(productData);
-      alert("✅ Product created successfully!");
-      setProductData({
-        categoryId: "",
-        name: "",
-        description: "",
-        price: "",
-        stock: "",
-        originalPrice: "",
-      });
-    } catch (err) {
-      alert(err.message || "Failed to create product");
-    }
-  };
+  // Create product with image
+const handleProductSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const formData = new FormData();
+    Object.entries(productData).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+    // append image files
+    // for (let i = 0; i < productData.images.length; i++) {
+    //   formData.append("images", productData.images[i]);
+    // }
+
+    await createProduct(formData);
+    alert("✅ Product created successfully!");
+    setProductData({
+      categoryId: "",
+      name: "",
+      description: "",
+      price: "",
+      stock: "",
+      originalPrice: "",
+      images: [],
+    });
+  } catch (err) {
+    alert(err.message || "Failed to create product");
+  }
+};
+
 
   return (
     <div className="p-8 space-y-12 bg-gray-50 min-h-screen mt-20">
@@ -279,7 +292,11 @@ const AdminDashboard = () => {
         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
           🛒 Create Product
         </h2>
-        <form onSubmit={handleProductSubmit} className="space-y-5 max-w-lg">
+        <form
+          onSubmit={handleProductSubmit}
+          className="space-y-5 max-w-lg"
+          encType="multipart/form-data"
+        >
           {[
             {
               label: "Category ID",
@@ -350,6 +367,30 @@ const AdminDashboard = () => {
               )}
             </div>
           ))}
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Product Image
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                setProductImage(file);
+                setPreviewImage(file ? URL.createObjectURL(file) : null);
+              }}
+              className="border px-4 py-2 rounded-lg w-full focus:ring-2 focus:ring-purple-400 outline-none transition"
+            />
+            {previewImage && (
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="mt-3 w-40 h-40 object-cover rounded-lg border"
+              />
+            )}
+          </div>
 
           <button
             type="submit"

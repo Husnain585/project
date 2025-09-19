@@ -4,7 +4,7 @@ module.exports = {
       if (!req.user) {
         return res.status(401).json({ message: "Unauthorized. Login required." });
       }
-      if (req.user.role?.toLowerCase() === "admin") {
+      if (req.user.role?.toLowerCase() === "admin" || req.user.role?.toLowerCase() === "vendor") {
         return next();
       }
       return res.status(403).json({ message: "Access denied. Admins only." });

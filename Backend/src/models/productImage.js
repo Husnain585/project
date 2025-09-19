@@ -3,6 +3,7 @@ const connection = require("../config/db.connection");
 const { v4: uuid } = require("uuid");
 const Product = require("./product");
 
+// models/productImage.js
 class ProductImage extends Model {}
 
 ProductImage.init(
@@ -10,7 +11,7 @@ ProductImage.init(
     imageId: {
       type: DataTypes.UUID,
       primaryKey: true,
-      defaultValue: uuid, // UUIDv4
+      defaultValue: uuid,
     },
     productId: {
       type: DataTypes.UUID,
@@ -19,12 +20,15 @@ ProductImage.init(
         model: Product,
         key: "productId",
       },
-      onDelete: "CASCADE", // delete images when product is deleted
+      onDelete: "CASCADE",
     },
-    url: {
+    data: {
+      type: DataTypes.BLOB, // store binary data
+      allowNull: false,
+    },
+    mimeType: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue : "https://unsplash.com/photos/white-and-brown-plastic-bottles-nwOip8AOZz0",
     },
     altText: {
       type: DataTypes.STRING,
@@ -42,7 +46,6 @@ ProductImage.init(
     timestamps: true,
     paranoid: true,
     hooks: {
-      // Before saving (create/update), enforce one primary image per product
       async beforeSave(image) {
         if (image.isPrimary) {
           await ProductImage.update(
@@ -50,7 +53,7 @@ ProductImage.init(
             {
               where: {
                 productId: image.productId,
-                imageId: { [connection.Sequelize.Op.ne]: image.imageId }, // exclude current image
+                imageId: { [connection.Sequelize.Op.ne]: image.imageId },
               },
             }
           );

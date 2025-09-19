@@ -2,18 +2,25 @@ const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
   try {
-    const token = req.cookies?.auth; // read JWT from cookie
-
+    const token = req.cookies?.auth || req.headers["authorization"]?.split(" ")[1]; 
     if (!token) {
       return res.status(401).json({ error: "Access denied. No token provided." });
     }
 
-    // Verify token
     const decoded = jwt.verify(token, process.env.SECRET);
-    req.user = decoded; // attach decoded payload (userId, username) to request
 
-    next(); // continue to the protected route
+    // Ensure vendorId always exists (null if not vendor)
+    req.user = {
+      userId: decoded.userId,
+      username: decoded.username,
+      role: decoded.role,
+      vendorId: decoded.vendorId ?? null,
+    };
+
+    next();
   } catch (err) {
-    return res.status(401).json({ error: "Invalid or expired token. Please login again." });
+    return res
+      .status(401)
+      .json({ error: "Invalid or expired token. Please login again." });
   }
 };

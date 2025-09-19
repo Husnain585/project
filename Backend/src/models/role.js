@@ -1,6 +1,7 @@
 // role.js
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
+const {v4: uuid} = require("uuid")
 
 class Role extends Model {}
 
@@ -9,7 +10,7 @@ Role.init(
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
-      defaultValue: DataTypes.UUIDV4,
+      defaultValue: uuid(),
     },
     name: {
       type: DataTypes.STRING(50), // e.g. "admin", "customer", "vendor"

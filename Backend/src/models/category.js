@@ -9,7 +9,7 @@ Category.init(
     categoryId: {
       type: DataTypes.UUID,
       primaryKey: true,
-      defaultValue: uuid,
+      defaultValue: DataTypes.UUIDV4,
     },
     name: {
       type: DataTypes.STRING(100),

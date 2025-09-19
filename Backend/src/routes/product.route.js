@@ -1,5 +1,11 @@
+// routes/product.route.js
 const router = require("express").Router();
-const authMiddleware = require("../middleware/authCheck.middleware"); // optional: only admin can create/update/delete
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+const authMiddleware = require("../middleware/authCheck.middleware");
+const { adminCheck } = require("../middleware/adminCheck.middleware");
 const {
   createProduct,
   getAllProducts,
@@ -7,15 +13,15 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../controller/product.controller");
-const { adminCheck } = require("../middleware/adminCheck.middleware");
 
 // Public routes
 router.get("/", getAllProducts);
 router.get("/:productId", getProductById);
 
 // Protected routes (admin)
-router.post("/", authMiddleware, adminCheck, createProduct);
-router.put("/:productId", authMiddleware, adminCheck, updateProduct);
+// ⬇️ accept multiple images (max 5 for example)
+router.post("/", authMiddleware, adminCheck, upload.array("images", 5), createProduct);
+router.put("/:productId", authMiddleware, adminCheck, upload.array("images", 5), updateProduct);
 router.delete("/:productId", authMiddleware, adminCheck, deleteProduct);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const { DataTypes, Model } = require("sequelize");
 const connection = require("../config/db.connection");
-
+const { v4: uuid } = require("uuid");
+const User = require("./users");
 class Vendor extends Model {}
 
 Vendor.init(
@@ -9,6 +10,13 @@ Vendor.init(
       primaryKey: true,
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
+    },
+    userId: {
+      type: DataTypes.UUID, 
+      references: {
+        model: User, 
+        key: "userId", 
+      },
     },
     name: {
       type: DataTypes.STRING(255),
