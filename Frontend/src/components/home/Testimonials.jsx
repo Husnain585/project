@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { useTheme } from "../../context/ThemeContext"; 
+import { useTheme } from "../../context/ThemeContext";
 import { Quote } from "lucide-react";
 
 const testimonials = [
@@ -33,7 +33,7 @@ const Testimonials = () => {
       }}
     >
       {/* Decorative Glow Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" style={{ backgroundColor: themeConfig.background }}/>
 
       <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* Title */}

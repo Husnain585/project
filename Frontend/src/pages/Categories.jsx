@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import {useTheme} from "../context/ThemeContext";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const {themeConfig} = useTheme();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -34,7 +36,8 @@ const Categories = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="container mx-auto px-4 py-10"
+      className="container mt-20 px-4 py-10 max-w-dvw max-h-dvw"
+      style={{backgroundColor: themeConfig.background}}
     >
       <h1 className="text-3xl md:text-4xl font-bold mb-8 text-center text-gray-800 dark:text-white">
         Shop by Category

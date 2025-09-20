@@ -7,7 +7,10 @@ const PromoBanner = () => {
   const { themeConfig } = useTheme();
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-8">
+    <section
+      className="max-w-vw mx-auto px-6 py-20 grid md:grid-cols-2 gap-8"
+      style={{ backgroundColor: themeConfig.background }}
+    >
       {/* Electronics Promo */}
       <motion.div
         className="relative rounded-3xl overflow-hidden shadow-xl group"
