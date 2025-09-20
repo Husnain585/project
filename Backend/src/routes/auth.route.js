@@ -11,10 +11,12 @@ const {
 } = require("../controller/auth.controller");
 
 const authMiddleware = require("../middleware/authCheck.middleware");
+const {loginSchema, registerSchema} = require("../validation/user.validator")
+const validate = require("../middleware/validate.middleware");
 
-routes.post("/login", Login);
+routes.post("/login", validate(loginSchema), Login);
 routes.post("/logout", Logout);
-routes.post("/register", Register);
+routes.post("/register", validate(registerSchema), Register);
 
 // Google OAuth
 routes.get("/google", LoginWithGoogle);
