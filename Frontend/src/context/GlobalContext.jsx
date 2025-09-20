@@ -15,6 +15,12 @@ export const GlobalContext = createContext(null);
 const getId = (p) => p?.id ?? p?.productId ?? p;
 const safeNum = (n) => (Number.isFinite(Number(n)) ? Number(n) : 0);
 
+// -------------------------
+// Helpers for user-scoped storage
+// -------------------------
+const CART_KEY = (userId) => `cart_${userId}`;
+const WISHLIST_KEY = (userId) => `wishlist_${userId}`;
+
 export const GlobalProvider = ({ children }) => {
   // -------------------------
   // Auth/User
@@ -64,10 +70,21 @@ export const GlobalProvider = ({ children }) => {
   // -------------------------
   // Hydrate cart & wishlist from localStorage
   // -------------------------
+  // -------------------------
+  // Load cart & wishlist when user changes
+  // -------------------------
   useEffect(() => {
+    if (!user) {
+      setCart([]);
+      setCartCount(0);
+      setWishlist([]);
+      setWishlistCount(0);
+      return;
+    }
+
     try {
       const savedCart = JSON.parse(
-        localStorage.getItem(config.storageKeys.cart) || "[]"
+        localStorage.getItem(CART_KEY(user.userId)) || "[]"
       );
       setCart(savedCart);
       setCartCount(savedCart.reduce((acc, i) => acc + safeNum(i.quantity), 0));
@@ -78,7 +95,7 @@ export const GlobalProvider = ({ children }) => {
 
     try {
       const savedWishlist = JSON.parse(
-        localStorage.getItem(config.storageKeys.wishlist) || "[]"
+        localStorage.getItem(WISHLIST_KEY(user.userId)) || "[]"
       );
       setWishlist(savedWishlist);
       setWishlistCount(savedWishlist.length);
@@ -86,7 +103,7 @@ export const GlobalProvider = ({ children }) => {
       setWishlist([]);
       setWishlistCount(0);
     }
-  }, []);
+  }, [user]);
 
   // -------------------------
   // Fetch current user
@@ -260,17 +277,26 @@ export const GlobalProvider = ({ children }) => {
   // -------------------------
   // Cart
   // -------------------------
+  // -------------------------
+  // Persist helpers
+  // -------------------------
   const persistCart = (next) => {
-    localStorage.setItem(config.storageKeys.cart, JSON.stringify(next));
+    if (!user) return;
+    localStorage.setItem(CART_KEY(user.userId), JSON.stringify(next));
     setCartCount(next.reduce((acc, i) => acc + safeNum(i.quantity), 0));
   };
+
   const addToCart = (input, quantity = 1) => {
+    if (!user) return;
+
     const product =
       typeof input === "object"
         ? input
         : products.find((p) => getId(p) === getId(input));
     if (!product) return;
+
     const pid = getId(product);
+
     setCart((prev) => {
       const ix = prev.findIndex((i) => i.productId === pid);
       const next =
@@ -285,7 +311,9 @@ export const GlobalProvider = ({ children }) => {
       return next;
     });
   };
+
   const updateQty = (productId, nextQty) => {
+    if (!user) return;
     const pid = getId(productId);
     setCart((prev) => {
       const next = prev
@@ -299,7 +327,9 @@ export const GlobalProvider = ({ children }) => {
       return next;
     });
   };
+
   const removeFromCart = (productId) => {
+    if (!user) return;
     const pid = getId(productId);
     setCart((prev) => {
       const next = prev.filter((i) => i.productId !== pid);
@@ -307,10 +337,12 @@ export const GlobalProvider = ({ children }) => {
       return next;
     });
   };
+
   const clearCart = () => {
+    if (!user) return;
     setCart([]);
     setCartCount(0);
-    localStorage.removeItem(config.storageKeys.cart);
+    localStorage.removeItem(CART_KEY(user.userId));
   };
   const calculateTotal = useMemo(
     () => () =>
@@ -326,32 +358,48 @@ export const GlobalProvider = ({ children }) => {
   // Wishlist
   // -------------------------
   const persistWishlist = (next) => {
-    localStorage.setItem(config.storageKeys.wishlist, JSON.stringify(next));
+    if (!user) return;
+    localStorage.setItem(WISHLIST_KEY(user.userId), JSON.stringify(next));
     setWishlistCount(next.length);
   };
   const addToWishlist = (product) => {
+    if (!user) return;
     const pid = getId(product);
-    setWishlist((prev) =>
-      prev.some((p) => getId(p) === pid) ? prev : [...prev, product]
-    );
-    persistWishlist([...wishlist, product]);
+    setWishlist((prev) => {
+      const next = prev.some((p) => getId(p) === pid)
+        ? prev
+        : [...prev, product];
+      persistWishlist(next);
+      return next;
+    });
   };
+
   const removeFromWishlist = (productId) => {
+    if (!user) return;
     const pid = getId(productId);
-    setWishlist((prev) => prev.filter((p) => getId(p) !== pid));
-    persistWishlist(wishlist.filter((p) => getId(p) !== pid));
+    setWishlist((prev) => {
+      const next = prev.filter((p) => getId(p) !== pid);
+      persistWishlist(next);
+      return next;
+    });
   };
+
   const toggleWishlist = (product) => {
+    if (!user) return;
     const pid = getId(product);
-    setWishlist((prev) =>
-      prev.some((p) => getId(p) === pid)
+    setWishlist((prev) => {
+      const next = prev.some((p) => getId(p) === pid)
         ? prev.filter((p) => getId(p) !== pid)
-        : [...prev, product]
-    );
-    persistWishlist(wishlist);
+        : [...prev, product];
+      persistWishlist(next);
+      return next;
+    });
   };
-  const isInWishlist = (productId) =>
-    wishlist.some((p) => getId(p) === getId(productId));
+
+  const isInWishlist = (productId) => {
+    if (!user) return false;
+    return wishlist.some((p) => getId(p) === getId(productId));
+  };
 
   // -------------------------
   // AdminDashboard
