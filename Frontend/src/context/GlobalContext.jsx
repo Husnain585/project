@@ -9,21 +9,20 @@ import config from "../config/config";
 import axiosInstance from "../utils/axiosInstance";
 import ThemeContext, { ThemeProvider } from "./ThemeContext";
 import { jwtDecode } from "jwt-decode";
+
 export const GlobalContext = createContext(null);
 
+// -------------------------
 // Helpers
+// -------------------------
 const getId = (p) => p?.id ?? p?.productId ?? p;
 const safeNum = (n) => (Number.isFinite(Number(n)) ? Number(n) : 0);
-
-// -------------------------
-// Helpers for user-scoped storage
-// -------------------------
 const CART_KEY = (userId) => `cart_${userId}`;
 const WISHLIST_KEY = (userId) => `wishlist_${userId}`;
 
 export const GlobalProvider = ({ children }) => {
   // -------------------------
-  // Auth/User
+  // Auth / User
   // -------------------------
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(
@@ -48,14 +47,10 @@ export const GlobalProvider = ({ children }) => {
   const [loadingVendorProducts, setLoadingVendorProducts] = useState(false);
 
   // -------------------------
-  // Cart
+  // Cart & Wishlist
   // -------------------------
   const [cart, setCart] = useState([]);
   const [cartCount, setCartCount] = useState(0);
-
-  // -------------------------
-  // Wishlist
-  // -------------------------
   const [wishlist, setWishlist] = useState([]);
   const [wishlistCount, setWishlistCount] = useState(0);
 
@@ -67,9 +62,6 @@ export const GlobalProvider = ({ children }) => {
     else localStorage.removeItem(config.storageKeys.authToken);
   }, [token]);
 
-  // -------------------------
-  // Hydrate cart & wishlist from localStorage
-  // -------------------------
   // -------------------------
   // Load cart & wishlist when user changes
   // -------------------------
@@ -106,39 +98,26 @@ export const GlobalProvider = ({ children }) => {
   }, [user]);
 
   // -------------------------
-  // Fetch current user
+  // User API & Auth actions
   // -------------------------
   const fetchUser = async () => {
-    if (!token) {
-      setUser(null);
-      setLoadingUser(false);
-      return;
-    }
+    if (!token) return setUser(null) && setLoadingUser(false);
+
     try {
       setLoadingUser(true);
-
-      // Always decode JWT locally
       const decoded = jwtDecode(token);
       let enrichedUser = {
         userId: decoded.userId,
         username: decoded.username,
         role: decoded.role,
-        vendorId: decoded.vendorId ?? null, // ✅ persist vendorId
+        vendorId: decoded.vendorId ?? null,
       };
 
-      // Optionally fetch from backend to keep in sync
       const res = await axiosInstance.get("/user/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (res.data.user) {
-        enrichedUser = { ...enrichedUser, ...res.data.user };
-      }
-
-      // If your backend returns a fresh token, update storage
-      if (res.data.token) {
-        setToken(res.data.token);
-        localStorage.setItem(config.storageKeys.authToken, res.data.token);
-      }
+      if (res.data.user) enrichedUser = { ...enrichedUser, ...res.data.user };
+      if (res.data.token) setToken(res.data.token);
 
       setUser(enrichedUser);
     } catch (err) {
@@ -151,84 +130,71 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
+  const updateUser = async (data) => {
+    if (!token) throw new Error("Not authenticated");
+    const res = await axiosInstance.put("/user/update", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setUser(res.data.user || res.data);
+    return res.data;
+  };
+
+  const deleteUser = async () => {
+    if (!token) throw new Error("Not authenticated");
+    await axiosInstance.delete("/user/delete", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setUser(null);
+    setToken(null);
+  };
+
+  const changePassword = async (data) => {
+    if (!token) throw new Error("Not authenticated");
+    const res = await axiosInstance.post("/user/change-password", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  };
+
   useEffect(() => {
     fetchUser();
   }, [token]);
 
   // -------------------------
-  // User API actions
+  // Products & Categories actions
   // -------------------------
-  const updateUser = async (data) => {
-    if (!token) throw new Error("Not authenticated");
+  const fetchProducts = async () => {
     try {
-      const res = await axiosInstance.put("/user/update", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(res.data.user || res.data);
-      return res.data;
+      setLoadingProducts(true);
+      const res = await axiosInstance.get("/product");
+      setProducts(res.data.products || res.data || []);
     } catch (err) {
-      throw err;
+      console.error("Failed to fetch products", err);
+    } finally {
+      setLoadingProducts(false);
     }
   };
 
-  const deleteUser = async () => {
-    if (!token) throw new Error("Not authenticated");
+  const fetchCategories = async () => {
     try {
-      await axiosInstance.delete("/user/delete", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(null);
-      setToken(null);
+      setLoadingCategories(true);
+      const res = await axiosInstance.get("/category");
+      setCategories(res.data.categories || res.data || []);
     } catch (err) {
-      throw err;
+      console.error("Failed to fetch categories", err);
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
-  const changePassword = async (data) => {
-    if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.post("/user/change-password", data, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return res.data;
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  // -------------------------
-  // Products & Categories
-  // -------------------------
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoadingProducts(true);
-        const res = await axiosInstance.get("/product");
-        setProducts(res.data.products || res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch products", err);
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-
-    const fetchCategories = async () => {
-      try {
-        setLoadingCategories(true);
-        const res = await axiosInstance.get("/category");
-        setCategories(res.data.categories || res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch categories", err);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
     fetchProducts();
     fetchCategories();
   }, []);
 
-  // Vendor
-  // Fetch all vendors
+  // -------------------------
+  // Vendor actions
+  // -------------------------
   const fetchVendors = async () => {
     try {
       setLoadingVendors(true);
@@ -243,7 +209,6 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
-  // Fetch products for a specific vendor
   const fetchVendorProducts = async (vendorId) => {
     try {
       setLoadingVendorProducts(true);
@@ -252,33 +217,23 @@ export const GlobalProvider = ({ children }) => {
       });
       setVendorProducts(res.data.products || res.data || []);
     } catch (err) {
-      console.error(`Failed to fetch products for vendor ${vendorId}`, err);
+      console.error(`Failed to fetch vendor products`, err);
     } finally {
       setLoadingVendorProducts(false);
     }
   };
 
-  // Create a new vendor
   const createVendor = async (vendorData) => {
     if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.post("/vendor", vendorData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      // Optionally refresh the vendor list
-      fetchVendors();
-      return res.data.vendor || res.data;
-    } catch (err) {
-      console.error("Failed to create vendor", err);
-      throw err;
-    }
+    const res = await axiosInstance.post("/vendor", vendorData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchVendors();
+    return res.data.vendor || res.data;
   };
 
   // -------------------------
-  // Cart
-  // -------------------------
-  // -------------------------
-  // Persist helpers
+  // Cart helpers & actions
   // -------------------------
   const persistCart = (next) => {
     if (!user) return;
@@ -288,7 +243,6 @@ export const GlobalProvider = ({ children }) => {
 
   const addToCart = (input, quantity = 1) => {
     if (!user) return;
-
     const product =
       typeof input === "object"
         ? input
@@ -296,7 +250,6 @@ export const GlobalProvider = ({ children }) => {
     if (!product) return;
 
     const pid = getId(product);
-
     setCart((prev) => {
       const ix = prev.findIndex((i) => i.productId === pid);
       const next =
@@ -344,6 +297,7 @@ export const GlobalProvider = ({ children }) => {
     setCartCount(0);
     localStorage.removeItem(CART_KEY(user.userId));
   };
+
   const calculateTotal = useMemo(
     () => () =>
       cart.reduce(
@@ -355,13 +309,14 @@ export const GlobalProvider = ({ children }) => {
   );
 
   // -------------------------
-  // Wishlist
+  // Wishlist helpers & actions
   // -------------------------
   const persistWishlist = (next) => {
     if (!user) return;
     localStorage.setItem(WISHLIST_KEY(user.userId), JSON.stringify(next));
     setWishlistCount(next.length);
   };
+
   const addToWishlist = (product) => {
     if (!user) return;
     const pid = getId(product);
@@ -396,117 +351,69 @@ export const GlobalProvider = ({ children }) => {
     });
   };
 
-  const isInWishlist = (productId) => {
-    if (!user) return false;
-    return wishlist.some((p) => getId(p) === getId(productId));
-  };
+  const isInWishlist = (productId) =>
+    user ? wishlist.some((p) => getId(p) === getId(productId)) : false;
 
   // -------------------------
-  // AdminDashboard
+  // Admin / Orders
   // -------------------------
   const getAllOrders = async () => {
     if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.get("/order/admin/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return res.data.orders || res.data;
-    } catch (err) {
-      console.error("Failed to fetch all orders", err);
-      throw err;
-    }
+    const res = await axiosInstance.get("/order/admin/all", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.orders || res.data;
   };
 
   const statusOrder = async (orderId, status) => {
     if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.put(
-        `/order/admin/${orderId}/status`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      return res.data.order || res.data;
-    } catch (err) {
-      console.error(`Failed to update order ${orderId} status`, err);
-      throw err;
-    }
+    const res = await axiosInstance.put(
+      `/order/admin/${orderId}/status`,
+      { status },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return res.data.order || res.data;
   };
 
-  // VendorProducts
+  // -------------------------
+  // Product / Category CRUD
+  // -------------------------
   const createProduct = async (productData) => {
     if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.post("/product", productData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("res data", res.data);
-      return res.data.product || res.data;
-    } catch (err) {
-      console.error(
-        "Failed to create product",
-        err.response?.data || err.message
-      );
-      console.log(err);
-      throw err;
-    }
+    const res = await axiosInstance.post("/product", productData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.product || res.data;
   };
 
   const updateProduct = async (productId, productData) => {
     if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.put(
-        `/product/${productId}`,
-        productData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      return res.data.product || res.data;
-    } catch (err) {
-      console.error(
-        `Failed to update product ${productId}`,
-        err.response?.data || err.message
-      );
-      throw err;
-    }
+    const res = await axiosInstance.put(`/product/${productId}`, productData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.product || res.data;
   };
 
   const deleteProduct = async (productId) => {
     if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.delete(`/product/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return res.data.product || res.data;
-    } catch (err) {
-      console.error(
-        `Failed to delete product ${productId}`,
-        err.response?.data || err.message
-      );
-      throw err;
-    }
+    const res = await axiosInstance.delete(`/product/${productId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.product || res.data;
   };
-
-  // Category
 
   const createCategory = async (categoryData) => {
     if (!token) throw new Error("Not authenticated");
-    try {
-      const res = await axiosInstance.post("/category", categoryData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return res.data.category || res.data;
-    } catch (err) {
-      console.error("Failed to create category", err);
-      throw err;
-    }
+    const res = await axiosInstance.post("/category", categoryData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data.category || res.data;
   };
 
   return (
     <ThemeProvider>
       <GlobalContext.Provider
         value={{
-          // Auth/User
           user,
           setUser,
           token,
@@ -516,15 +423,10 @@ export const GlobalProvider = ({ children }) => {
           updateUser,
           deleteUser,
           changePassword,
-          // Products & Categories
           products,
           categories,
           loadingProducts,
           loadingCategories,
-          createProduct,
-          updateProduct,
-          deleteProduct,
-          // Cart
           cart,
           cartCount,
           addToCart,
@@ -532,22 +434,25 @@ export const GlobalProvider = ({ children }) => {
           removeFromCart,
           clearCart,
           calculateTotal,
-          // Wishlist
           wishlist,
           wishlistCount,
           addToWishlist,
           removeFromWishlist,
           toggleWishlist,
           isInWishlist,
-          // Admin
-          getAllOrders,
-          statusOrder,
-          createCategory,
-          createProduct,
-          // Vendor
+          vendors,
+          vendorProducts,
+          loadingVendors,
+          loadingVendorProducts,
           fetchVendors,
           fetchVendorProducts,
           createVendor,
+          getAllOrders,
+          statusOrder,
+          createProduct,
+          updateProduct,
+          deleteProduct,
+          createCategory,
         }}
       >
         {children}

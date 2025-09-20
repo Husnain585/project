@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import VendorRoute from "./VendorRoute";
+import ErrorPage from "../pages/ErrorPage";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
@@ -248,6 +249,14 @@ const AppRoutes = () => {
                   <OrderSuccess />
                 </PageWrapper>
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <PageWrapper>
+                <ErrorPage />
+              </PageWrapper>
             }
           />
         </Routes>
