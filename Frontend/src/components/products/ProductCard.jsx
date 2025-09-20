@@ -18,28 +18,50 @@ const Stars = ({ rating = 0 }) => {
   return (
     <div className="flex items-center gap-1">
       {Array.from({ length: full }).map((_, i) => (
-        <FontAwesomeIcon key={`f${i}`} icon={faStar} className="text-yellow-500" />
+        <FontAwesomeIcon
+          key={`f${i}`}
+          icon={faStar}
+          className="text-yellow-500"
+        />
       ))}
-      {half && <FontAwesomeIcon icon={faStarHalfStroke} className="text-yellow-500" />}
+      {half && (
+        <FontAwesomeIcon icon={faStarHalfStroke} className="text-yellow-500" />
+      )}
       {Array.from({ length: blanks }).map((_, i) => (
-        <span key={`b${i}`} className="w-3 h-3 rounded-sm bg-gray-200 inline-block" />
+        <span
+          key={`b${i}`}
+          className="w-3 h-3 rounded-sm bg-gray-200 inline-block"
+        />
       ))}
     </div>
   );
 };
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, index }) => {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
 
   const liked = isInWishlist(product.productId);
-  const discounted = product.originalPrice && product.originalPrice > product.price;
+  const discounted =
+    product.originalPrice && product.originalPrice > product.price;
   const discountPercent = discounted
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    ? Math.round(
+        ((product.originalPrice - product.price) / product.originalPrice) * 100
+      )
     : 0;
 
-  const image = product.images?.[0]?.url || "https://picsum.photos/600/600?random=1";
+  const getImageSrc = (img, fallbackIndex) => {
+    if (!img || !img.data)
+      return `https://picsum.photos/600/600?random=3`;
+    return img.data; // already full data URL
+  };
+
+  const images = product.images?.length
+    ? product.images.map((img) => getImageSrc(img, index))
+    : [getImageSrc(null, index)];
+
+  const image = images[0];
 
   const handleWishlistClick = () => toggleWishlist(product);
   const handleAddToCart = () => addToCart(product, 1);
@@ -64,7 +86,10 @@ const ProductCard = ({ product }) => {
             onClick={handleWishlistClick}
             className="absolute top-3 right-3 bg-white/90 dark:bg-gray-700/80 backdrop-blur px-2 py-2 rounded-full shadow hover:scale-105 transition"
           >
-            <FontAwesomeIcon icon={faHeart} className={liked ? "text-red-500" : "text-gray-700"} />
+            <FontAwesomeIcon
+              icon={faHeart}
+              className={liked ? "text-red-500" : "text-gray-700"}
+            />
           </button>
         </div>
 
@@ -72,17 +97,27 @@ const ProductCard = ({ product }) => {
           <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
             {product.category?.name || "General"}
           </p>
-          <h3 className="font-semibold mt-1 line-clamp-1 text-gray-900 dark:text-white">{product.name}</h3>
+          <h3 className="font-semibold mt-1 line-clamp-1 text-gray-900 dark:text-white">
+            {product.name}
+          </h3>
           <Stars rating={product.rating} />
 
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{formatCurrency(product.price)}</span>
+            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+              {formatCurrency(product.price)}
+            </span>
             {discounted && (
-              <span className="line-through text-gray-400 text-sm">{formatCurrency(product.originalPrice)}</span>
+              <span className="line-through text-gray-400 text-sm">
+                {formatCurrency(product.originalPrice)}
+              </span>
             )}
           </div>
 
-          <p className={`mt-1 text-sm font-medium ${product.stock > 0 ? "text-green-600" : "text-red-600"}`}>
+          <p
+            className={`mt-1 text-sm font-medium ${
+              product.stock > 0 ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {product.stock > 0 ? "In Stock" : "Out of Stock"}
           </p>
 
@@ -108,7 +143,12 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {quickViewOpen && <ProductQuickViewModal product={product} onClose={() => setQuickViewOpen(false)} />}
+      {quickViewOpen && (
+        <ProductQuickViewModal
+          product={product}
+          onClose={() => setQuickViewOpen(false)}
+        />
+      )}
     </>
   );
 };

@@ -1,4 +1,3 @@
-// routes/product.route.js
 const router = require("express").Router();
 const multer = require("multer");
 const storage = multer.memoryStorage();
@@ -18,10 +17,23 @@ const {
 router.get("/", getAllProducts);
 router.get("/:productId", getProductById);
 
-// Protected routes (admin)
-// ⬇️ accept multiple images (max 5 for example)
-router.post("/", authMiddleware, adminCheck, upload.array("images", 5), createProduct);
-router.put("/:productId", authMiddleware, adminCheck, upload.array("images", 5), updateProduct);
+// Protected routes (admin/vendor)
+router.post(
+  "/",
+  authMiddleware,
+  adminCheck,                 // or remove adminCheck if vendors also allowed
+  upload.array("images", 5),  // must match frontend input name
+  createProduct
+);
+
+router.put(
+  "/:productId",
+  authMiddleware,
+  adminCheck,
+  upload.array("images", 5),
+  updateProduct
+);
+
 router.delete("/:productId", authMiddleware, adminCheck, deleteProduct);
 
 module.exports = router;

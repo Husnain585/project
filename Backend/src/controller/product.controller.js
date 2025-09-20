@@ -5,7 +5,7 @@ const Vendor = require("../models/vendor");
 
 module.exports = {
   // Create a new product
-  createProduct: async (req, res) => {
+   createProduct: async (req, res) => {
     try {
       const {
         name,
@@ -14,7 +14,7 @@ module.exports = {
         stock,
         categoryId,
         originalPrice,
-        vendorId: bodyVendorId, // only used if admin
+        vendorId: bodyVendorId,
       } = req.body;
 
       if (!req.user) {
@@ -25,9 +25,11 @@ module.exports = {
       const role = req.user.role?.toLowerCase();
 
       if (role === "vendor") {
-        // if (!req.user.vendorId) {
-        //   return res.status(403).json({ error: "Vendor account not linked properly" });
-        // }
+        if (!req.user.vendorId) {
+          return res
+            .status(403)
+            .json({ error: "Vendor account not linked properly" });
+        }
         vendorId = req.user.vendorId;
       } else if (role === "admin") {
         if (!bodyVendorId) {
@@ -40,13 +42,14 @@ module.exports = {
         return res.status(403).json({ error: "Not authorized to create products" });
       }
 
-      // Ensure categoryId exists
       if (!categoryId) {
         return res.status(400).json({ error: "Category ID is required" });
       }
 
       // Prevent duplicate product name for the same vendor
-      const existingProduct = await Product.findOne({ where: { name, vendorId } });
+      const existingProduct = await Product.findOne({
+        where: { name, vendorId },
+      });
       if (existingProduct) {
         return res.status(400).json({
           error: "A product with this name already exists for this vendor",
