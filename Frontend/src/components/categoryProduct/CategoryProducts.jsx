@@ -5,13 +5,14 @@ import { motion } from "framer-motion";
 import { GlobalContext } from "../../context/GlobalContext";
 import axiosInstance from "../../utils/axiosInstance";
 
+const placeholderImg = "https://picsum.photos/400/300";
+
 const CategoryProducts = () => {
   const { categoryId } = useParams();
   const { addToCart } = useContext(GlobalContext);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [imagesMap, setImagesMap] = useState({}); // store images per product
 
   // Fetch all products and filter by categoryId
   useEffect(() => {
@@ -24,22 +25,8 @@ const CategoryProducts = () => {
           (p) => String(p.categoryId) === String(categoryId)
         );
         setProducts(filtered);
-
-        // Fetch images for each filtered product
-        const imagesPromises = filtered.map(async (p) => {
-          try {
-            const imgRes = await axiosInstance.get(`/product-image/${p.productId}`);
-            return { [p.productId]: imgRes.data.images || [] };
-          } catch {
-            return { [p.productId]: [] };
-          }
-        });
-
-        const imagesArray = await Promise.all(imagesPromises);
-        const imagesObj = Object.assign({}, ...imagesArray);
-        setImagesMap(imagesObj);
       } catch (err) {
-        console.error("Error fetching products/images:", err);
+        console.error("Error fetching products:", err);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -50,18 +37,27 @@ const CategoryProducts = () => {
   }, [categoryId]);
 
   const handleAddToCart = (product) => {
+    const image =
+      product.images?.length > 0
+        ? product.images[0].data
+        : `${placeholderImg}?random=${product.productId}`;
+
     addToCart({
       id: product.productId,
       name: product.name,
       price: product.price,
-      image: imagesMap[product.productId]?.[0]?.imageUrl || "",
+      image,
       quantity: 1,
     });
   };
 
   if (loading) return <p className="text-center mt-10">Loading products...</p>;
   if (!products.length)
-    return <p className="text-center mt-10">No products found in this category.</p>;
+    return (
+      <p className="text-center mt-10">
+        No products found in this category.
+      </p>
+    );
 
   return (
     <motion.div
@@ -74,42 +70,45 @@ const CategoryProducts = () => {
         Products in this Category
       </h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <motion.div
-            key={product.productId}
-            className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition cursor-pointer flex flex-col"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            {imagesMap[product.productId]?.[0]?.imageUrl ? (
+        {products.map((product) => {
+          const image =
+            product.images?.length > 0
+              ? product.images[0].data
+              : `${placeholderImg}?random=${product.productId}`;
+
+          return (
+            <motion.div
+              key={product.productId}
+              className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition cursor-pointer flex flex-col"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
               <img
-                src={imagesMap[product.productId][0].imageUrl}
+                src={image}
                 alt={product.name}
                 className="w-full h-56 object-cover"
               />
-            ) : (
-              <div className="w-full h-56 bg-gray-200 flex items-center justify-center">
-                No Image
+              <div className="p-4 flex flex-col justify-between flex-1">
+                <Link
+                  to={`/product/${product.productId}`}
+                  className="text-lg font-semibold hover:text-blue-600 mb-2"
+                >
+                  {product.name}
+                </Link>
+                <p className="text-gray-600 mb-4">
+                  ${product.price ?? "N/A"}
+                </p>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleAddToCart(product)}
+                  className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold"
+                >
+                  Add to Cart
+                </motion.button>
               </div>
-            )}
-            <div className="p-4 flex flex-col justify-between flex-1">
-              <Link
-                to={`/product/${product.productId}`}
-                className="text-lg font-semibold hover:text-blue-600 mb-2"
-              >
-                {product.name}
-              </Link>
-              <p className="text-gray-600 mb-4">${product.price ?? "N/A"}</p>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleAddToCart(product)}
-                className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold"
-              >
-                Add to Cart
-              </motion.button>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );

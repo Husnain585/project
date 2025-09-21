@@ -14,7 +14,7 @@ const authMiddleware = require("../middleware/authCheck.middleware");
 const {loginSchema, registerSchema} = require("../validation/user.validator")
 const validate = require("../middleware/validate.middleware");
 
-routes.post("/login", validate(loginSchema), Login);
+routes.post("/login",  Login);
 routes.post("/logout", Logout);
 routes.post("/register", validate(registerSchema), Register);
 
