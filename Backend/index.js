@@ -71,7 +71,7 @@ app.use((err, req, res, next) => {
 
 // DB sync
 db.connection
-  .sync({ alter: true, logging: false })
+  .sync()
   .then(() => console.log("Database synchronized"))
   .catch((err) => console.error("Error synchronizing database:", err));
 
